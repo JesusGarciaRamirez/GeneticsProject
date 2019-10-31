@@ -14,8 +14,11 @@
 %%Loading all datasets
 datasets=load_datasets;
 
+%Hay que cargar los datos por file name en lugar de index
+
+
 %Getting the tables for each dataset
 for index = 1:5
-    x,y,NVAR=load_data(index); %%Getting Dataset (Index) to perform test
+    [x,y,NVAR]=load_data(index,datasets); %%Getting Dataset (Index) to perform test
     perform_tests(x,y,NVAR,index);
 end
