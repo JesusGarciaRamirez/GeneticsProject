@@ -1,11 +1,32 @@
-function perform_tests()
+function perform_tests(x,y,NVAR,Index)
 %myFun - Description
 %
 % Syntax: output = myFun(input)
 %
 % Long description
-Best_vector=zeros(1,N_EXPERIMENTS);
 
+%%Loading Parameters
+MAXGEN=100;		% Maximum no. of generations
+STOP_PERCENTAGE=.95;    % percentage of equal fitness individuals for stopping
+CROSSOVER = 'xalt_edges';  % default crossover operator
+NIND = [50, 100, 150];
+ELITIST = [0 0.05 0.2];
+PR_CROSS = [.5 .9 1];
+PR_MUT = [0 .05 .2];
+LOCALLOOP = [0 1];
+N_EXPERIMENTS = 20;
+
+cont=0;%Total number of different parameter combinations
+
+%%Name of the file to save table from experiment i 
+file_name=sprintf("Results_Dataset_%d.csv", Index)
+%Var Initialization
+Best_vector=zeros(1,N_EXPERIMENTS);
+Av_Best=0;
+Peak_Best=0;
+Fit_var=0;
+%Creating Table
+Results=table(NIND(1),ELITIST(1),PR_CROSS(1),PR_MUT(1),LOCALLOOP(1),NVAR,Av_Best,Peak_Best,Fit_var)
 
 for i=1:length(NIND)
     for j=1:length(ELITIST)
@@ -15,18 +36,27 @@ for i=1:length(NIND)
                     for n=1:N_EXPERIMENTS
                         Best_vector(n) = run_ga_return(x, y, NIND(i), MAXGEN, NVAR, ELITIST(j), STOP_PERCENTAGE, PR_CROSS(k), PR_MUT(l), CROSSOVER, LOCALLOOP(m));
                     end
+                    cont=cont+1;
                     Av_Best=mean(Best_vector);
                     Peak_Best=min(Best_vector); %The lower the fitness, the better
                     Fit_var=var(Best_vector);
-                    fprintf('Average best , Peak best  and Variance= \t %f , %f ,  %f \n',Av_Best,Peak_Best,Fit_var)
+                    %%"Appending" the results in a new row 
+                    Results.NIND(cont)=NIND(i);
+                    Results.ELITIST(cont)=ELITIST(j);
+                    Results.PR_CROSS(cont)=PR_CROSS(k);
+                    Results.PR_MUT(cont)=PR_MUT(l);
+                    Results.LOCALLOOP(cont)=LOCALLOOP(m);
+                    Results.Av_Best(cont)=Av_Best;
+                    Results.Peak_Best(cont)=Peak_Best;
+                    Results.Fit_var(cont)=Fit_var;
+                    fprintf('Average best , Peak best  and Variance= \t %f , %f ,  %f #iteration = %d \n',Av_Best,Peak_Best,Fit_var,cont)
                 end
             end
         end
     end
 end
 
-Table=table(NIND,ELITIST,PR_CROSS,PR_MUT,LOCALLOOP,NVAR,Av_Best,Peak_Best,Fit_var)
-
-
+%Saving Table to file
+writetable(Results,file_name)
 
 end

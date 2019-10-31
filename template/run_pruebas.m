@@ -11,21 +11,11 @@
 % % LOCALLOOP=0;      % local loop removal
 % CROSSOVER = 'xalt_edges';  % default crossover operator
 
-%%Loading Parameters
-MAXGEN=100;		% Maximum no. of generations
-STOP_PERCENTAGE=.95;    % percentage of equal fitness individuals for stopping
-CROSSOVER = 'xalt_edges';  % default crossover operator
-NIND = [50, 100, 150];
-ELITIST = [0 0.05 0.2];
-PR_CROSS = [.5 .9 1];
-PR_MUT = [0 .05 .2];
-LOCALLOOP = [0 1];
-N_EXPERIMENTS = 20;
-
 %%Loading all datasets
 datasets=load_datasets;
 
-%%Getting Dataset (Index) to perform test
-index=1; %Ej. First dataset
-x,y,NVAR = load_data(index);
-
+%Getting the tables for each dataset
+for index = 1:5
+    x,y,NVAR=load_data(index); %%Getting Dataset (Index) to perform test
+    perform_tests(x,y,NVAR,index);
+end

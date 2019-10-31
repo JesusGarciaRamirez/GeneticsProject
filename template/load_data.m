@@ -1,4 +1,4 @@
-function x,y,NVAR = load_data(index)
+function [x,y,NVAR] = load_data(index,datasets)
 %myFun - Description
 %
 % Syntax: output = myFun(input)
