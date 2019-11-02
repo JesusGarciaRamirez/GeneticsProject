@@ -19,15 +19,8 @@ N_EXPERIMENTS = 20;
 cont=0;%Total number of different parameter combinations
 
 %%Name of the file to save table from experiment i 
-file_name=sprintf("Results_Dataset_%d.csv", Index)
+file_name=sprintf("Results/Results_Dataset_%d.csv", Index)
 
-% %Var Initialization
-% Best_vector=zeros(1,N_EXPERIMENTS);
-% Av_Best=0;
-% Peak_Best=0;
-% Fit_var=0;
-% %Creating Table
-% Results=table(NIND(1),ELITIST(1),PR_CROSS(1),PR_MUT(1),LOCALLOOP(1),NVAR,Av_Best,Peak_Best,Fit_var)
 
 %Creating Empty Table for Results
 Initialization=zeros(1,9);

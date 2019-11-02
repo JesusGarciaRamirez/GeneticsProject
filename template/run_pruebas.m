@@ -18,7 +18,8 @@ datasets=load_datasets;
 
 
 %Getting the tables for each dataset
-for index = 1:5
+for index = 2:3:length(datasets)
     [x,y,NVAR]=load_data(index,datasets); %%Getting Dataset (Index) to perform test
     perform_tests(x,y,NVAR,index);
+    sprintf("Finished dataset %d",index)
 end
