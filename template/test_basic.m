@@ -15,24 +15,25 @@ PR_CROSS = [.5 .9 1];
 PR_MUT = [0 .05 .2];
 LOCALLOOP = [0 1];
 N_EXPERIMENTS = 20;
+STOP_EPOCHS = 100;
 
 cont=0;%Total number of different parameter combinations
 
 %%Name of the file to save table from experiment i 
-file_name=sprintf("Results/Results_Dataset_%d.csv", Index)
+file_name=sprintf("Results/Results_Dataset_%d.csv", Index);
 
 
 %Creating Empty Table for Results
 Initialization=zeros(1,9);
-Results = array2table(Initialization,'VariableNames',{'NIND','ELITIST','PR_CROSS','PR_MUT','LOCALLOOP','NVAR','Av_Best',...
-                        'Peak_Best','Fit_Var'});
+Results = array2table(Initialization,'VariableNames',{'NIND','ELITIST','PR_CROSS','PR_MUT','LOCALLOOP','Av_Best',...
+                        'Peak_Best','Fit_var'});
 for i=1:length(NIND)
     for j=1:length(ELITIST)
         for k=1:length(PR_CROSS)
             for l=1:length(PR_MUT)
                 for m=1:length(LOCALLOOP)
                     for n=1:N_EXPERIMENTS
-                        Best_vector(n) = run_ga_return(x, y, NIND(i), MAXGEN, NVAR, ELITIST(j), STOP_PERCENTAGE, PR_CROSS(k), PR_MUT(l), CROSSOVER, LOCALLOOP(m));
+                        [Best_vector(n), ~] = run_ga_return(x, y, NIND(i), MAXGEN, NVAR, ELITIST(j), STOP_PERCENTAGE, PR_CROSS(k), PR_MUT(l), CROSSOVER, LOCALLOOP(m), STOP_EPOCHS);
                     end
                     cont=cont+1;
                     Av_Best=mean(Best_vector);
