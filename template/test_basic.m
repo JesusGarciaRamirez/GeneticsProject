@@ -1,4 +1,4 @@
-function perform_tests(x,y,NVAR,Index)
+function test_basic(x,y,NVAR,Index)
 %myFun - Description
 %
 % Syntax: output = myFun(input)

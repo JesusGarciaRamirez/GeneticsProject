@@ -1,4 +1,4 @@
-function best_fitness = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP)
+function [best_fitness, gen] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS)
 % usage: run_ga(x, y, 
 %               NIND, MAXGEN, NVAR, 
 %               ELITIST, STOP_PERCENTAGE, 
@@ -14,6 +14,7 @@ function best_fitness = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PE
 % PR_CROSS: probability for crossover
 % PR_MUT: probability for mutation
 % CROSSOVER: the crossover operator
+% STOP_EPOCHS: number of epochs to stop if the best fitness does not improve
 % calculate distance matrix between each pair of cities
 %
 %{NIND MAXGEN NVAR ELITIST STOP_PERCENTAGE PR_CROSS PR_MUT CROSSOVER LOCALLOOP}
@@ -40,8 +41,12 @@ function best_fitness = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PE
     % evaluate initial population
     ObjV = tspfun(Chrom,Dist);
     best=zeros(1,MAXGEN);
+    % counter of epochs without chenge in the fittest
+    change_cont = 0;
+    
     % generational loop
-    while gen<MAXGEN
+    while gen<MAXGEN && change_cont < STOP_EPOCHS
+        
         sObjV=sort(ObjV);
         best(gen+1)=min(ObjV);
         minimum=best(gen+1);
@@ -71,8 +76,14 @@ function best_fitness = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PE
         [Chrom ObjV]=reins(Chrom,SelCh,1,1,ObjV,ObjVSel);
         
         Chrom = tsp_ImprovePopulation(NIND, NVAR, Chrom,LOCALLOOP,Dist);
+        if  best(gen + 1) - best(gen) > 10e-6
+            change_cont = 0;
+        else
+            change_cont = change_cont + 1;
+        end
         %increment generation counter
-        gen=gen+1;            
+        gen=gen+1;    
+        
     end
     ending = min(gen+1, MAXGEN);
     best_fitness = min(best(1:ending));
