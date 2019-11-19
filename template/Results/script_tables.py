@@ -3,7 +3,6 @@ import os
 
 current_path=os.getcwd()
 tables=[table for table in os.listdir(current_path) if "csv" in table]
-# print(tables)
 
 def table_processing(table_name,current_path):
     table_path=os.path.join(current_path,table_name)
