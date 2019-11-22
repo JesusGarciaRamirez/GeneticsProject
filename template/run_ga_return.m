@@ -1,11 +1,8 @@
-function [best_fitness, gen] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS)
+function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS)
 % usage: run_ga(x, y, 
 %               NIND, MAXGEN, NVAR, 
 %               ELITIST, STOP_PERCENTAGE, 
 %               PR_CROSS, PR_MUT, CROSSOVER)
-%               
-%
-%
 % x, y: coordinates of the cities
 % NIND: number of individuals
 % MAXGEN: maximal number of generations
@@ -17,6 +14,10 @@ function [best_fitness, gen] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, 
 % STOP_EPOCHS: number of epochs to stop if the best fitness does not improve
 % calculate distance matrix between each pair of cities
 %
+
+%%We return best vector which contains the best fitness at each generation to calculate efficiency
+
+
 %{NIND MAXGEN NVAR ELITIST STOP_PERCENTAGE PR_CROSS PR_MUT CROSSOVER LOCALLOOP}
 
 
