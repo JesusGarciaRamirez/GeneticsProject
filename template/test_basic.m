@@ -7,7 +7,7 @@ function test_basic(x,y,NVAR,Index)
 
 %%Loading Parameters
 MAXGEN=100;		% Maximum no. of generations
-STOP_PERCENTAGE=.95;    % percentage of equal fitness individuals for stopping
+STOP_PERCENTAGE=1;    % percentage of equal fitness individuals for stopping
 CROSSOVER = 'xalt_edges';  % default crossover operator
 NIND = [50, 100, 150];
 ELITIST = [0 0.05 0.2];
@@ -19,7 +19,8 @@ STOP_EPOCHS = 100;
 
 cont=0;%Total number of different parameter combinations
 
-%%Name of the file to save table from experiment i 
+%%Name of the file to save table from experiment i
+
 file_name=sprintf("Results/Results_Dataset_%d.csv", Index);
 
 
@@ -27,6 +28,7 @@ file_name=sprintf("Results/Results_Dataset_%d.csv", Index);
 Initialization=zeros(1,9);
 Results = array2table(Initialization,'VariableNames',{'NIND','ELITIST','PR_CROSS','PR_MUT','LOCALLOOP','Av_Best',...
                         'Peak_Best','Fit_var'});
+
 for i=1:length(NIND)
     for j=1:length(ELITIST)
         for k=1:length(PR_CROSS)
@@ -39,7 +41,7 @@ for i=1:length(NIND)
                     Av_Best=mean(Best_vector);
                     Peak_Best=min(Best_vector); %The lower the fitness, the better
                     Fit_var=var(Best_vector);
-                    %%"Appending" the results in a new row 
+                    %%"Appending" the results in a new row
                     Results.NIND(cont)=NIND(i);
                     Results.ELITIST(cont)=ELITIST(j);
                     Results.PR_CROSS(cont)=PR_CROSS(k);
@@ -54,6 +56,8 @@ for i=1:length(NIND)
         end
     end
 end
+
+
 
 %Saving Table to file
 writetable(Results,file_name)
