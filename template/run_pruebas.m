@@ -11,15 +11,14 @@
 % % LOCALLOOP=0;      % local loop removal
 % CROSSOVER = 'xalt_edges';  % default crossover operator
 
-%%Loading all datasets
-datasets=load_datasets;
+%% We are going to use the following datasets as test datasets for our parameter configurations
 
-%Hay que cargar los datos por file name en lugar de index
-
+dataset_list=['rondrit016.tsp','rondrit048.tsp','rondrit070.tsp','rondrit127.tsp'];
 
 %Getting the tables for each dataset
-for index = 2:3:length(datasets)
-    [x,y,NVAR]=load_data(index,datasets); %%Getting Dataset (Index) to perform test
+for index = 1:length(dataset_list)
+    dataset_name=dataset_list(index);
+    [x,y,NVAR]=load_data(dataset_name); %%Getting Dataset (Index) to perform test
     perform_tests(x,y,NVAR,index);
     sprintf("Finished dataset %d",index)
 end
