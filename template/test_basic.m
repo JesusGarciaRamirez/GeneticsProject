@@ -21,9 +21,10 @@ STOP_EPOCHS = 100;
 [ ~,filename, ~]=fileparts(dataset_file);
 results_path=['Results/Results_' filename '.csv'];
 
+table_path=sprintf("Eff_str%s.mat", filename);
 %Initializations
 %%Table
-Initialization=zeros(1,8);
+Initialization=zeros(1,9);
 Results = array2table(Initialization,'VariableNames',{'NIND','ELITIST','PR_CROSS','PR_MUT','Av_Best',...
                         'Peak_Best','Fit_var','Eff','Eff_Var'});
 
@@ -32,13 +33,15 @@ cont=0;
 %%Structure to save efficiency curves
 Eff_structure=struct;
 
+Eff_vector=struct;
+
 for i=1:length(NIND)
     for j=1:length(ELITIST)
         for k=1:length(PR_CROSS)
             for l=1:length(PR_MUT)
                     for n=1:N_EXPERIMENTS
-                        [Best_vector(n), best] = run_ga_return(x, y, NIND(i), MAXGEN, NVAR, ELITIST(j), STOP_PERCENTAGE, PR_CROSS(k), PR_MUT(l), CROSSOVER, LOCALLOOP(m), STOP_EPOCHS);
-                        Eff_vector(n)=get_efficiency(best);
+                        [Best_vector(n), best] = run_ga_return(x, y, NIND(i), MAXGEN, NVAR, ELITIST(j), STOP_PERCENTAGE, PR_CROSS(k), PR_MUT(l), CROSSOVER, LOCALLOOP, STOP_EPOCHS);
+                        Eff_vector.values{n}=get_efficiency(best,NIND(i));
                     end
                     cont=cont+1;
                     Av_Best=mean(Best_vector);
@@ -56,8 +59,8 @@ for i=1:length(NIND)
                     Results.Peak_Best(cont)=Peak_Best; %%Me olvidaria del peak best
                     Results.Fit_var(cont)=Fit_var;
                     Results.Eff(cont)=sum(Eff_vector_final); %%Area bajo la curva
-                    Results.Eff_Var(cont)=var(Eff_vector);
-                    fprintf("Finished iter no. %d",cont)
+                    Results.Eff_Var(cont)=var(Eff_vector_final);
+                    fprintf("Finished iter no. %d \n",cont)
             end
         end
     end
@@ -66,6 +69,6 @@ end
 %%Saving Table to file
 writetable(Results,results_path)
 %%Saving efficiency curves
-save(["Eff_Str" dataset_file ".mat"],'Eff_structure')
+save(table_path,'Eff_structure')
 
 end

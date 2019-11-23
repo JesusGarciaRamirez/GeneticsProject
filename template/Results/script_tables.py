@@ -22,3 +22,16 @@ def get_tablename(table_name):
     name_cropped=name[0]+"_Fittest."+name[1]
     return name_cropped
 pass
+
+# def normalise_row(row):
+# pass
+
+def normalised_table(table):
+
+    n_table=table.copy()
+    n_table=n_table.rename(columns={''})
+
+    
+
+pass
+

@@ -42,11 +42,10 @@ function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,
     % evaluate initial population
     ObjV = tspfun(Chrom,Dist);
     best=zeros(1,MAXGEN);
-    % counter of epochs without chenge in the fittest
-    change_cont = 0;
+   
     
     % generational loop
-    while gen<MAXGEN && change_cont < STOP_EPOCHS
+    while gen<MAXGEN  
         
         sObjV=sort(ObjV);
         best(gen+1)=min(ObjV);
@@ -61,9 +60,15 @@ function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,
         
         % visualizeTSP(x,y,adj2path(Chrom(t,:)), minimum, ah1, gen, best, mean_fits, worst, ah2, ObjV, NIND, ah3);
 
-        if (sObjV(stopN)-sObjV(1) <= 1e-15)
-                break;
-        end          
+
+        %%Stopping Criteria 
+        
+        % if (sObjV(stopN)-sObjV(1) <= 1e-15)
+        %         break;
+        % end       
+        
+        
+
         %assign fitness values to entire population
         FitnV=ranking(ObjV);
         %select individuals for breeding
@@ -74,18 +79,14 @@ function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,
         %evaluate offspring, call objective function
         ObjVSel = tspfun(SelCh,Dist);
         %reinsert offspring into population
-        [Chrom ObjV]=reins(Chrom,SelCh,1,1,ObjV,ObjVSel);
+        [Chrom ,ObjV]=reins(Chrom,SelCh,1,1,ObjV,ObjVSel);
         
         Chrom = tsp_ImprovePopulation(NIND, NVAR, Chrom,LOCALLOOP,Dist);
-        if  best(gen + 1) - best(gen) > 10e-6
-            change_cont = 0;
-        else
-            change_cont = change_cont + 1;
-        end
+       
         %increment generation counter
         gen=gen+1;    
         
     end
-    ending = min(gen+1, MAXGEN);
-    best_fitness = min(best(1:ending));
+    % ending = min(gen+1, MAXGEN);
+    best_fitness = min(best);
 end
