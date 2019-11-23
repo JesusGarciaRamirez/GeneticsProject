@@ -33,8 +33,7 @@ function [best_fitness, gen] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, 
     % initialize population
     Chrom=zeros(NIND,NVAR);
     for row=1:NIND
-        Chrom(row,:)=path2adj(randperm(NVAR));
-        %Chrom(row,:)=randperm(NVAR);
+        Chrom(row,:)=randperm(NVAR);
     end
     gen=0;
     % number of individuals of equal fitness needed to stop

@@ -33,8 +33,7 @@ function [best_fitness, gen] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, 
     % initialize population
     Chrom=zeros(NIND,NVAR);
     for row=1:NIND
-        Chrom(row,:)=path2adj(randperm(NVAR));
-        %Chrom(row,:)=randperm(NVAR);
+        Chrom(row,:)=randperm(NVAR);
     end
     gen=0;
     % number of individuals of equal fitness needed to stop
@@ -59,7 +58,7 @@ function [best_fitness, gen] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, 
             end
         end
         
-        % visualizeTSP(x,y,adj2path(Chrom(t,:)), minimum, ah1, gen, best, mean_fits, worst, ah2, ObjV, NIND, ah3);
+        % visualizeTSP(x,y,Chrom(t,:), minimum, ah1, gen, best, mean_fits, worst, ah2, ObjV, NIND, ah3);
 
         if (sObjV(stopN)-sObjV(1) <= 1e-15)
                 break;
@@ -69,7 +68,7 @@ function [best_fitness, gen] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, 
         %select individuals for breeding
         SelCh=select('sus', Chrom, FitnV, GGAP);
         %recombine individuals (crossover)
-        SelCh = recombin(CROSSOVER,SelCh,PR_CROSS);
+        SelCh = recombin_path(CROSSOVER,SelCh,PR_CROSS,Dist);
         SelCh=mutateTSP('inversion',SelCh,PR_MUT);
         %evaluate offspring, call objective function
         ObjVSel = tspfun(SelCh,Dist);
