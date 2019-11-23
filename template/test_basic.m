@@ -32,16 +32,18 @@ Results = array2table(Initialization,'VariableNames',{'NIND','ELITIST','PR_CROSS
 cont=0;
 %%Structure to save efficiency curves
 Eff_structure=struct;
+Eff_vector_final=zeros(1,MAXGEN);
+Eff_vector=zeros(N_EXPERIMENTS,MAXGEN);
 
-Eff_vector=struct;
-
+%%Performing Tests
 for i=1:length(NIND)
     for j=1:length(ELITIST)
         for k=1:length(PR_CROSS)
             for l=1:length(PR_MUT)
                     for n=1:N_EXPERIMENTS
                         [Best_vector(n), best] = run_ga_return(x, y, NIND(i), MAXGEN, NVAR, ELITIST(j), STOP_PERCENTAGE, PR_CROSS(k), PR_MUT(l), CROSSOVER, LOCALLOOP, STOP_EPOCHS);
-                        Eff_vector.values{n}=get_efficiency(best,NIND(i));
+                        Eff_vector(n,:)=get_efficiency(best,NIND(i));
+
                     end
                     cont=cont+1;
                     Av_Best=mean(Best_vector);
@@ -59,7 +61,7 @@ for i=1:length(NIND)
                     Results.Peak_Best(cont)=Peak_Best; %%Me olvidaria del peak best
                     Results.Fit_var(cont)=Fit_var;
                     Results.Eff(cont)=sum(Eff_vector_final); %%Area bajo la curva
-                    Results.Eff_Var(cont)=var(Eff_vector_final);
+                    % Results.Eff_Var(cont)=var(Eff_vector_final); %%Esta varianza no tiene mucho sentido
                     fprintf("Finished iter no. %d \n",cont)
             end
         end
