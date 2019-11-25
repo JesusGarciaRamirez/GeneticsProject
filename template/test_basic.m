@@ -19,14 +19,14 @@ STOP_EPOCHS = 100;
 
 %%Name of the file to save table from experiment i
 [ ~,filename, ~]=fileparts(dataset_file);
-results_path=['Results/Results_' filename '.csv'];
+table_path=['Results/Results_' filename '.csv'];
 
-table_path=sprintf("Eff_str%s.mat", filename);
+eff_path=sprintf("Results/Eff_str%s.mat", filename);
 %Initializations
 %%Table
-Initialization=zeros(1,9);
+Initialization=zeros(1,8);
 Results = array2table(Initialization,'VariableNames',{'NIND','ELITIST','PR_CROSS','PR_MUT','Av_Best',...
-                        'Peak_Best','Fit_var','Eff','Eff_Var'});
+                        'Peak_Best','Fit_var','Eff'});
 
 %Total number of different parameter combinations
 cont=0;
@@ -69,8 +69,8 @@ for i=1:length(NIND)
 end
 
 %%Saving Table to file
-writetable(Results,results_path)
+writetable(Results,table_path)
 %%Saving efficiency curves
-save(table_path,'Eff_structure')
+save(eff_path,'Eff_structure')
 
 end
