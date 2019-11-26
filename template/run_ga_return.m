@@ -58,9 +58,6 @@ function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,
                 break;
             end
         end
-        
-        % visualizeTSP(x,y,adj2path(Chrom(t,:)), minimum, ah1, gen, best, mean_fits, worst, ah2, ObjV, NIND, ah3);
-
 
         %%Stopping Criteria 
         
@@ -69,6 +66,9 @@ function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,
         % end       
         
         
+        if(criteria==True)
+            break;
+        end
 
         %assign fitness values to entire population
         FitnV=ranking(ObjV);
@@ -90,6 +90,8 @@ function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,
         gen=gen+1;    
         
     end
-    % ending = min(gen+1, MAXGEN);
+
+
+    ending = min(gen+1, MAXGEN); %% Number of generations performed before reaching stopping criteria 
     best_fitness = min(best);
 end

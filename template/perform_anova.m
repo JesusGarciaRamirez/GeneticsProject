@@ -23,10 +23,10 @@ function stats=perform_anova(table_file,column,test_parameters,N_tests)
         [~,~,stats] = anovan(y,groups,'model','interaction',...
         'varnames',{'NIND','ELITIST','PR_MUT','PR_CROSS'});
 
+    %%Perform n-way ANOVA to Av_Best_unit
     elseif column=="Av_Best_unit"
         fprintf("Performing ANOVA of %s",column)
         y=T.Av_Best_unit;
-        %%Perform n-way ANOVA to Av_Best_unit
         [~,~,stats] = anovan(y,groups,'model','interaction',...
         'varnames',{'NIND','ELITIST','PR_MUT','PR_CROSS'});
     else
