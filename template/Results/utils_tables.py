@@ -2,6 +2,8 @@ import pandas as pd
 import os
 import numpy as np
 
+import seaborn as sns
+
 # current_path=os.getcwd()
 # tables=[table for table in os.listdir(current_path) if "csv" in table]
 
@@ -40,3 +42,27 @@ def unit_transform(column):
 
     
 
+##Plotting
+# library
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+
+def plot_3d(res_table,x,y,z):
+    # Make the plot
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.plot_trisurf(res_table[y], res_table[x], res_table[z], cmap=plt.cm.viridis, linewidth=0.2)
+    plt.show()
+    
+    # to Add a color bar which maps values to colors.
+    surf=ax.plot_trisurf(res_table[y], res_table[x], res_table[z], cmap=plt.cm.viridis, linewidth=0.2)
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+    plt.show()
+    
+    # Rotate it
+    ax.view_init(30, 45)
+    plt.show()
+    
+    # Other palette
+    ax.plot_trisurf(res_table[y], res_table[x], res_table[z], cmap=plt.cm.jet, linewidth=0.01)
+    plt.show()

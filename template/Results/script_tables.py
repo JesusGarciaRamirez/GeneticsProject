@@ -16,12 +16,16 @@ def process_table(table_name):
     #opening table
     assert os.path.isfile(table_path) , "Path not correctly defined"
     res_table=pd.read_csv(table_path)
-    res_table=res_table.drop(columns="Eff_Var")
-    # res_table.head()
+    # if ("Eff_Var" in res_table.columns):
+    #     res_table=res_table.drop(columns="Eff_Var")
+    
+
+    
     #Normalizing columns
-    metric_list=["Av_Best","Fit_var","Eff"]
+    metric_list=["Eff"]
     norm_table=normalise_metrics(metric_list,res_table)
-    norm_table.head()
+    # norm_table.head()
+    
     ##Getting final metric(average of metrics) and ranking
     norm_table["sum"]=norm_table[["Av_Best_unit","Fit_var_unit","Eff_unit"]].sum(axis=1)
     final_table=norm_table.sort_values("sum",ascending=False)
