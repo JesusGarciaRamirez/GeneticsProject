@@ -20,21 +20,27 @@ def process_table(table_name):
     #     res_table=res_table.drop(columns="Eff_Var")
     
 
-    
+    res_table=res_table.drop(columns={"Eff_2","Fit_var"})
+    res_table["Av_Best"]=res_table["Av_Best"].apply(lambda x: 1/x )
+    res_table["Peak_Best"]=res_table["Peak_Best"].apply(lambda x: 1/x )
     #Normalizing columns
-    metric_list=["Eff"]
+    metric_list=["Av_Best","Eff_1","Peak_Best"]
     norm_table=normalise_metrics(metric_list,res_table)
     # norm_table.head()
+
+    # ##Getting final metric(average of metrics) and ranking
+    # norm_table["sum"]=norm_table[["Av_Best_unit","Fit_var_unit","Eff_unit"]].sum(axis=1)
+    # final_table=norm_table.sort_values("sum",ascending=False)
     
-    ##Getting final metric(average of metrics) and ranking
-    norm_table["sum"]=norm_table[["Av_Best_unit","Fit_var_unit","Eff_unit"]].sum(axis=1)
-    final_table=norm_table.sort_values("sum",ascending=False)
     # final_table=final_table.drop(columns='Unnamed: 0')  ##we have to do this efficiently !
     #Saving table
     final_table_name=get_tablename(table_name)
     table_path=os.path.join(table_folder,final_table_name)
-    final_table.to_csv(table_path)
+    norm_table.to_csv(table_path)
     print("Correctly saved table  {0}".format(table_name))
+
+
+
 
 if __name__ == "__main__":
 
