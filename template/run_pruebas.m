@@ -6,5 +6,5 @@ function  run_pruebas(dataset_name)
 %Getting the tables for each dataset
 [x,y,NVAR]=load_data(dataset_name); %%Getting Dataset (Index) to perform test
 test_basic(x,y,NVAR,dataset_name);
-print("Finished tests")
+fprintf("Finished tests \n")
 end
