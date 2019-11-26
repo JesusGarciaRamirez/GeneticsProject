@@ -1,4 +1,4 @@
-function [best_fitness, gen] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS)
+function [best_fitness, gen] = run_ga_return_path(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, MUTATION, LOCALLOOP, STOP_EPOCHS)
 % usage: run_ga(x, y, 
 %               NIND, MAXGEN, NVAR, 
 %               ELITIST, STOP_PERCENTAGE, 
@@ -39,52 +39,50 @@ function [best_fitness, gen] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, 
     % number of individuals of equal fitness needed to stop
     stopN=ceil(STOP_PERCENTAGE*NIND);
     % evaluate initial population
-    ObjV = tspfun(Chrom,Dist);
-    best=zeros(1,MAXGEN);
+    ObjV = tspfun_path(Chrom,Dist);
+    best=NaN(1,MAXGEN);
     % counter of epochs without chenge in the fittest
     change_cont = 0;
     
     % generational loop
-    while gen<MAXGEN && change_cont < STOP_EPOCHS
+    while gen<MAXGEN
         
-        sObjV=sort(ObjV);
+        %sObjV=sort(ObjV);
         best(gen+1)=min(ObjV);
         minimum=best(gen+1);
         mean_fits(gen+1)=mean(ObjV);
         worst(gen+1)=max(ObjV);
-        for t=1:size(ObjV,1)
-            if (ObjV(t)==minimum)
-                break;
-            end
-        end
+        %
+        %for t=1:size(ObjV,1)
+        %    if (ObjV(t)==minimum)
+        %        break;
+        %    end
+        %end
         
         % visualizeTSP(x,y,Chrom(t,:), minimum, ah1, gen, best, mean_fits, worst, ah2, ObjV, NIND, ah3);
-
-        if (sObjV(stopN)-sObjV(1) <= 1e-15)
-                break;
-        end          
+        %
+        %if (sObjV(stopN)-sObjV(1) <= 1e-15)
+        %        break;
+        %end          
         %assign fitness values to entire population
         FitnV=ranking(ObjV);
         %select individuals for breeding
         SelCh=select('sus', Chrom, FitnV, GGAP);
         %recombine individuals (crossover)
         SelCh = recombin_path(CROSSOVER,SelCh,PR_CROSS,Dist);
-        SelCh=mutateTSP('inversion',SelCh,PR_MUT);
+        SelCh=mutateTSP(MUTATION,SelCh,PR_MUT);
         %evaluate offspring, call objective function
-        ObjVSel = tspfun(SelCh,Dist);
+        ObjVSel = tspfun_path(SelCh,Dist);
+        if nnz(~ObjVSel)
+            fprintf('something went really bad\n');      
+        end
         %reinsert offspring into population
-        [Chrom ObjV]=reins(Chrom,SelCh,1,1,ObjV,ObjVSel);
+        [Chrom, ObjV]=reins(Chrom,SelCh,1,1,ObjV,ObjVSel);
         
         Chrom = tsp_ImprovePopulation(NIND, NVAR, Chrom,LOCALLOOP,Dist);
-        if  best(gen + 1) - best(gen) > 10e-6
-            change_cont = 0;
-        else
-            change_cont = change_cont + 1;
-        end
         %increment generation counter
         gen=gen+1;    
         
     end
-    ending = min(gen+1, MAXGEN);
-    best_fitness = min(best(1:ending));
+    best_fitness = min(best);
 end

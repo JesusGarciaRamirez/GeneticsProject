@@ -1,7 +1,6 @@
 function NewChrom = recombin_path(REC_F, Chrom, RecOpt, Dist);
 % Recombines population
 
-
 % Check parameter consistency
    if nargin < 2, error('Not enough input parameter'); end
 
@@ -39,6 +38,7 @@ function NewChrom = recombin_path(REC_F, Chrom, RecOpt, Dist);
                 break;
             end
         end
+        i = 1;%%%%%%%%%%%%%%%%%%%%
         if i > 1
             c1 = [Chrom(row,i:cols),Chrom(row,1:i-1)];
             c2 = [Chrom(row+1,i:cols),Chrom(row+1,1:i-1)];
@@ -46,7 +46,7 @@ function NewChrom = recombin_path(REC_F, Chrom, RecOpt, Dist);
             c1 = Chrom(row,:);
             c2 = Chrom(row+1,:);
         end
-        if strcmp(REC_F,'cross_sequential_constructive') || strcmp(REC_F,'cross_rand_sequential_constructive')
+        if strcmp(REC_F,"cross_sequential_constructive") || strcmp(REC_F,"cross_rand_sequential_constructive") || strcmp(REC_F,"cross_mix")
             o1 = feval(REC_F, [c1;c2], Dist);
             o2 = feval(REC_F, [c2;c1], Dist);
         else

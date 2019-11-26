@@ -81,7 +81,9 @@ function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,
         ObjVSel = tspfun(SelCh,Dist);
         %reinsert offspring into population
         [Chrom ,ObjV]=reins(Chrom,SelCh,1,1,ObjV,ObjVSel);
-        
+        if nnz(~ObjV)
+            fprintf('SOmething went wrong\n');
+        end        
         Chrom = tsp_ImprovePopulation(NIND, NVAR, Chrom,LOCALLOOP,Dist);
        
         %increment generation counter
