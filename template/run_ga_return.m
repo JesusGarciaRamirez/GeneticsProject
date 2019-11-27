@@ -1,4 +1,5 @@
-function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS)
+function [best_fitness, best,last_gen,best_stop] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,... 
+    STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS,STOP_CRIT)
 % usage: run_ga(x, y, 
 %               NIND, MAXGEN, NVAR, 
 %               ELITIST, STOP_PERCENTAGE, 
@@ -13,6 +14,8 @@ function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,
 % CROSSOVER: the crossover operator
 % STOP_EPOCHS: number of epochs to stop if the best fitness does not improve
 % calculate distance matrix between each pair of cities
+
+%STOP_CRIT:""
 %
 
 %%We return best vector which contains the best fitness at each generation to calculate efficiency
@@ -44,7 +47,14 @@ function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,
     ObjV = tspfun(Chrom,Dist);
     best=zeros(1,MAXGEN);
    
+    %%Vector for storing last gen using stopping criterion i
+    last_gen=zeros(1,3);
+    %%Flags for stopping criteria
+    flags_vector=logical(zeros(1,3));
+    %%Desired flags : "Definir esto bien" en este ejemplo queremos que se cumplan todas las stop conditions
+    desired_flags=get_flags(STOP_CRIT);
     
+    eq_fit_gen=0;%%Contador de # equal fitness generations
     % generational loop
     while gen<MAXGEN  
         
@@ -59,16 +69,47 @@ function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,
             end
         end
 
-        %%Stopping Criteria 
-        
-        % if (sObjV(stopN)-sObjV(1) <= 1e-15)
-        %         break;
-        % end       
-        
-        
-        if(criteria==True)
-            break;
+        %%Stopping Criterias (Only checked in case we specify at least one stopping criteria)
+        if(~(STOP_CRIT==false))
+            %%Eq number of fit evaluations
+            if(best(gen+1)-best(gen)>10e-5) 
+                eq_fit_gen=eq_fit_gen+1;  
+            else
+                eq_fit_gen=0;
+            end
+            
+            if(eq_fit_gen==5 &&  flags_vector(1)==false  && desired_flags(1)==true)
+                last_gen(1)=gen+1;
+                best_stop(1)=min(best);
+
+                flags_vector(1)=true;    
+            end
+
+            %%Efficiency criteria
+            %%Sacar absolute best
+
+            %%threshold
+            threshold=0.01; %%Mejora un 1%
+            if((best(gen+1)>(1/(1+threshold))*best(gen)) &&  flags_vector(2)==false && desired_flags(2)==true)
+                last_gen(2)=gen+1;
+                best_stop(2)=min(best);
+
+                flags_vector(2)=true;    
+            end
+            %%Diversity threshold
+            if(criteria==true &&  flags_vector(3)==false && desired_flags(3)==true)
+                last_gen(3)=gen+1;
+                flags_vector(3)=true;    
+                best_stop(3)=min(best);
+   
+            end
+
+            if (isequal(flags_vector,desired_flags)) 
+                break;
+            end
+
         end
+        
 
         %assign fitness values to entire population
         FitnV=ranking(ObjV);
@@ -92,6 +133,26 @@ function [best_fitness, best] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,
     end
 
 
-    ending = min(gen+1, MAXGEN); %% Number of generations performed before reaching stopping criteria 
+    % ending = min(gen+1, MAXGEN); %% Number of generations performed before reaching stopping criteria 
     best_fitness = min(best);
 end
+
+
+function desired_flags= get_flags(STOP_CRIT)
+    switch STOP_CRIT
+    case "Equal"
+        desired_flags=logical([1,0,0]);
+    case "Eff"
+        desired_flags=logical([0,1,0]);
+    case "Diversity"
+        desired_flags=logical([0,0,1]);
+    otherwise
+        desired_flags=logical(ones(1,3));
+    end
+    
+end
+
+
+
+
+

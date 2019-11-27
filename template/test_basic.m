@@ -16,7 +16,7 @@ PR_MUT = [0 .05 .1 .2];
 LOCALLOOP = 0;    %%Quitar local loop
 N_EXPERIMENTS = 20;
 STOP_EPOCHS = 100;
-
+STOP_CRIT=false;
 %%Name of the file to save table from experiment i
 [ ~,filename, ~]=fileparts(dataset_file);
 table_path=['Results/Results_' filename '.csv'];
@@ -44,7 +44,7 @@ for i=1:length(NIND)
         for k=1:length(PR_CROSS)
             for l=1:length(PR_MUT)
                     for n=1:N_EXPERIMENTS
-                        [Best_vector(n), best] = run_ga_return(x, y, NIND(i), MAXGEN, NVAR, ELITIST(j), STOP_PERCENTAGE, PR_CROSS(k), PR_MUT(l), CROSSOVER, LOCALLOOP, STOP_EPOCHS);
+                        [Best_vector(n), best,~,~] = run_ga_return(x, y, NIND(i), MAXGEN, NVAR, ELITIST(j), STOP_PERCENTAGE, PR_CROSS(k), PR_MUT(l), CROSSOVER, LOCALLOOP, STOP_EPOCHS,STOP_CRIT);
                         [Eff_vector_1(n,:),Eff_vector_2(n,:)]=get_efficiency(best,NIND(i));
 
                     end
