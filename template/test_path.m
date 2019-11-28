@@ -32,14 +32,14 @@ eff_path=sprintf("Tuning/Eff_str%s.mat", filename);
 
 %Initializations
 %%Table
-% CROSS = "";MUT = "";PR_CROSS=0;PR_MUT=0;Av_Best=0;Peak_Best=0;Fit_var=0;Eff_1=0;Eff_2=0;
-% Results = table(CROSS,MUT,PR_CROSS,PR_MUT,Av_Best,Peak_Best,Fit_var,Eff_1,Eff_2);
+CROSS = "";MUT = "";PR_CROSS=0;PR_MUT=0;Av_Best=0;Peak_Best=0;Eff_1=0;
+Results = table(CROSS,MUT,PR_CROSS,PR_MUT,Av_Best,Peak_Best,Eff_1);
 
 
 %%Table
-Initialization=zeros(1,7);
-Results = array2table(Initialization,'VariableNames',{'CROSS','MUT','PR_CROSS','PR_MUT','Av_Best',...
-                        'Peak_Best','Eff_1'});
+%Initialization=zeros(1,7);
+%Results = array2table(Initialization,'VariableNames',{'CROSS','MUT','PR_CROSS','PR_MUT','Av_Best',...
+                       % 'Peak_Best','Eff_1'});
 %Total number of different parameter combinations
 cont=0;
 
@@ -72,10 +72,8 @@ for i=1:length(CROSS_OP)
             % Fit_var=var(Best_vector_inv);
             
             Eff_vector_final_1=mean(Eff_vector_1); %%Final gr. efficiency haciendo av. efficiency de cada experimento
-            Eff_vector_final_2=mean(Eff_vector_2); %%Final gr. efficiency haciendo av. efficiency de cada experimento
             %%Saving curvas efficiency
             Eff_structure.curve_1{cont}=Eff_vector_final_1;
-            Eff_structure.curve_2{cont}=Eff_vector_final_2;
             %%"Appending" the results in a new row
             Results.CROSS(cont)=CROSS_OP_cat(i);
             Results.MUT(cont)=MUT_OP_cat(j);
@@ -86,8 +84,7 @@ for i=1:length(CROSS_OP)
             Results.Peak_Best(cont)=Peak_Best; %%Me olvidaria del peak best
 
             % Results.Fit_var(cont)=Fit_var;
-
-            Results.Eff_1(cont)=sum(Eff_vector_final_1); %%Area bajo la curva eff1, metrica ab de efficiency
+            Results.Eff_1(cont)=sum(Eff_vector_final_1)*100 %%Area bajo la curva eff1, metrica ab de efficiency
 
             % Results.Eff_2(cont)=sum(Eff_vector_final_2); %%Esta variable no aporta nada en la tabla
             % Total: 5 * 4 * N_SAME_EXP * N_EXP = 400 iterations
