@@ -1,11 +1,11 @@
-function [best_fitness, best,last_gen,best_stop] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,... 
+function [best_fitness, best,last_gen,best_stop,S] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,... 
     STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS,STOP_CRIT)
 % usage: run_ga(x, y, 
 %               NIND, MAXGEN, NVAR, 
 %               ELITIST, STOP_PERCENTAGE, 
 %               PR_CROSS, PR_MUT, CROSSOVER)
 % x, y: coordinates of the cities
-% NIND: number of individuals
+% NIND: number of individuals   
 % MAXGEN: maximal number of generations
 % ELITIST: percentage of elite population
 % STOP_PERCENTAGE: percentage of equal fitness (stop criterium)
@@ -48,15 +48,21 @@ function [best_fitness, best,last_gen,best_stop] = run_ga_return(x, y, NIND, MAX
     best=zeros(1,MAXGEN);
    
     %%Vector for storing last gen using stopping criterion i
-    last_gen=zeros(1,3);
+    last_gen=MAXGEN *ones(1,2);
     %%Flags for stopping criteria
-    flags_vector=logical(zeros(1,3));
+    flags_vector=logical(zeros(1,2));
     %%Desired flags : "Definir esto bien" en este ejemplo queremos que se cumplan todas las stop conditions
     desired_flags=get_flags(STOP_CRIT);
     
     eq_fit_gen=0;%%Contador de # equal fitness generations
+
+
+    S_aux=7.5;
+    cont_s=0;
+
+    %%Initialization best_stop
     % generational loop
-    while gen<MAXGEN  
+    while (gen<MAXGEN & ~(isequal(flags_vector,desired_flags)))
         
         sObjV=sort(ObjV);
         best(gen+1)=min(ObjV);
@@ -68,47 +74,51 @@ function [best_fitness, best,last_gen,best_stop] = run_ga_return(x, y, NIND, MAX
                 break;
             end
         end
+       
 
         %%Stopping Criterias (Only checked in case we specify at least one stopping criteria)
-        if(~(STOP_CRIT==false))
-            %%Eq number of fit evaluations
-            if(best(gen+1)-best(gen)>10e-5) 
+        if(~(STOP_CRIT=="false") & gen>0)
+        %%Eq number of fit evaluations
+            if((best(gen)-best(gen+1)<=0) ) 
                 eq_fit_gen=eq_fit_gen+1;  
             else
                 eq_fit_gen=0;
             end
             
-            if(eq_fit_gen==5 &&  flags_vector(1)==false  && desired_flags(1)==true)
+            if((eq_fit_gen==15 && flags_vector(1)==false  && desired_flags(1)==true))
                 last_gen(1)=gen+1;
-                best_stop(1)=min(best);
-
-                flags_vector(1)=true;    
+                flags_vector(1)=true; 
+            
             end
-
+        
             %%Efficiency criteria
             %%Sacar absolute best
 
-            %%threshold
-            threshold=0.01; %%Mejora un 1%
-            if((best(gen+1)>(1/(1+threshold))*best(gen)) &&  flags_vector(2)==false && desired_flags(2)==true)
+            % %%threshold %% creo que me la pela este criterio.
+            % threshold=0.0005; %%Mejora un 1%
+            % if(((best(gen+1)>(1/(1+threshold))*best(gen)) &&  flags_vector(2)==false && desired_flags(2)==true))
+            %     last_gen(2)=gen+1;
+            %     flags_vector(2)=true;    
+            % end
+            %%Diversity threshold
+            %%Get av_ diversity
+            
+            S(gen)=calc_av_diversity(Chrom);
+            if(S(gen)~=S_aux)
+                S_aux=S(gen);
+                cont_s=0;
+            else
+                cont_s=cont_s+1;
+            end
+            if(cont_s>10 &&  flags_vector(2)==false && desired_flags(2)==true) 
                 last_gen(2)=gen+1;
-                best_stop(2)=min(best);
-
+                % best_stop(3)=min(best(1:last_gen(3)));
                 flags_vector(2)=true;    
             end
-            %%Diversity threshold
-            if(criteria==true &&  flags_vector(3)==false && desired_flags(3)==true)
-                last_gen(3)=gen+1;
-                flags_vector(3)=true;    
-                best_stop(3)=min(best);
-   
-            end
 
-            if (isequal(flags_vector,desired_flags)) 
-                break;
-            end
 
         end
+
         
 
         %assign fitness values to entire population
@@ -132,7 +142,10 @@ function [best_fitness, best,last_gen,best_stop] = run_ga_return(x, y, NIND, MAX
         
     end
 
-
+    best_stop=zeros(1,2);
+    for i=1:length(last_gen)
+        best_stop(i)=min(best(1:last_gen(i)));
+    end 
     % ending = min(gen+1, MAXGEN); %% Number of generations performed before reaching stopping criteria 
     best_fitness = min(best);
 end
@@ -140,16 +153,16 @@ end
 
 function desired_flags= get_flags(STOP_CRIT)
     switch STOP_CRIT
-    case "Equal"
-        desired_flags=logical([1,0,0]);
-    case "Eff"
-        desired_flags=logical([0,1,0]);
-    case "Diversity"
-        desired_flags=logical([0,0,1]);
-    otherwise
-        desired_flags=logical(ones(1,3));
-    end
-    
+        case "Equal"
+            desired_flags=logical([1,0]);
+        % case "Eff"
+        %     desired_flags=logical([0,1,0]);
+        case "Diversity"
+            desired_flags=logical([0,1]);
+        otherwise
+            desired_flags=logical(ones(1,2));
+        end
+        
 end
 
 
