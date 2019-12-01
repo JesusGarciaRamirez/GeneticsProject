@@ -84,16 +84,13 @@ function [best_fitness, best,last_gen,best_stop,S] = run_ga_return(x, y, NIND, M
             else
                 eq_fit_gen=0;
             end
-            
             if((eq_fit_gen==15 && flags_vector(1)==false  && desired_flags(1)==true))
                 last_gen(1)=gen+1;
                 flags_vector(1)=true; 
             
             end
-        
             %%Efficiency criteria
             %%Sacar absolute best
-
             % %%threshold %% creo que me la pela este criterio.
             % threshold=0.0005; %%Mejora un 1%
             % if(((best(gen+1)>(1/(1+threshold))*best(gen)) &&  flags_vector(2)==false && desired_flags(2)==true))
@@ -102,7 +99,6 @@ function [best_fitness, best,last_gen,best_stop,S] = run_ga_return(x, y, NIND, M
             % end
             %%Diversity threshold
             %%Get av_ diversity
-            
             S(gen)=calc_av_diversity(Chrom);
             if(S(gen)~=S_aux)
                 S_aux=S(gen);
@@ -110,16 +106,12 @@ function [best_fitness, best,last_gen,best_stop,S] = run_ga_return(x, y, NIND, M
             else
                 cont_s=cont_s+1;
             end
-            if(cont_s>10 &&  flags_vector(2)==false && desired_flags(2)==true) 
+            if(cont_s>5 &&  flags_vector(2)==false && desired_flags(2)==true) 
                 last_gen(2)=gen+1;
                 % best_stop(3)=min(best(1:last_gen(3)));
                 flags_vector(2)=true;    
             end
-
-
         end
-
-        
 
         %assign fitness values to entire population
         FitnV=ranking(ObjV);
@@ -133,7 +125,7 @@ function [best_fitness, best,last_gen,best_stop,S] = run_ga_return(x, y, NIND, M
         %reinsert offspring into population
         [Chrom ,ObjV]=reins(Chrom,SelCh,1,1,ObjV,ObjVSel);
         if nnz(~ObjV)
-            fprintf('SOmething went wrong\n');
+            fprintf('Something went wrong\n');
         end        
         Chrom = tsp_ImprovePopulation(NIND, NVAR, Chrom,LOCALLOOP,Dist);
        
@@ -161,7 +153,7 @@ function desired_flags= get_flags(STOP_CRIT)
             desired_flags=logical([0,1]);
         otherwise
             desired_flags=logical(ones(1,2));
-        end
+    end
         
 end
 

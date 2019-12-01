@@ -4,7 +4,6 @@ function test_stop(x,y,NVAR,dataset_file,test_table,STOP_CRIT)
     % Syntax: output = myFun(input)
     %   test_table =parameter combinations to test the stopping criterion i
     % Long description
-    
 
     %%Fixed parameters 
     MAXGEN=100;% Maximum no. of generations
@@ -18,14 +17,12 @@ function test_stop(x,y,NVAR,dataset_file,test_table,STOP_CRIT)
     [ ~,filename, ~]=fileparts(dataset_file);
     test_table_path=['Results/Results_stop' filename '.csv'];
     
-    eff_path=sprintf("Results/Eff_stop_str%s.mat", filename);
-    
-    
-    %%Structure to save efficiency curves
-    Eff_structure=struct;
-    % Eff_vector_1=zeros(N_EXPERIMENTS,MAXGEN);
-    % Eff_vector_2=zeros(N_EXPERIMENTS,MAXGEN);
-    Best_vector=zeros(1,N_EXPERIMENTS);
+    % eff_path=sprintf("Stop/Eff_stop_str%s.mat", filename);
+    % %%Structure to save efficiency curves
+    % Eff_structure=struct;
+    % % Eff_vector_1=zeros(N_EXPERIMENTS,MAXGEN);
+    % % Eff_vector_2=zeros(N_EXPERIMENTS,MAXGEN);
+    % Best_vector=zeros(1,N_EXPERIMENTS);
     
     %%Read table with parameter combinations
     %%Read the normalised table and extract the parameter to perform anova
@@ -34,71 +31,44 @@ function test_stop(x,y,NVAR,dataset_file,test_table,STOP_CRIT)
     par_comb=readtable(table_path);
 
     %%Table
-    Initialization=zeros(1,7);
+    Initialization=zeros(1,5);
     Results = array2table(Initialization,'VariableNames',{'Test_id',...
-                            'Av_Best_eq','Av_Best_eff','Av_Best_div','Last_eq','Last_eff','Last_div'});
+                            'Av_Best_eq','Last_eq','Av_Best_div','Last_div'});
     %%Performing Tests
-    for i=1:2
+    for i=1:(height(par_comb))
         %%Loading parameter combination i from structure par_comb
         NIND=par_comb.NIND(i);
         ELITIST=par_comb.ELITIST(i);
         PR_CROSS=par_comb.PR_CROSS(i);
         PR_MUT=par_comb.PR_MUT(i);
         %%Performing n set of equal experiments
-        for n=1:1
-            [Best_vector(n), best,last_gen(n,:),best_stop(n,:),S] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS,STOP_CRIT);
-            % last_gen
-            % best_stop
-            best_idx=max(last_gen(n,:));
-            %%Si queremos plotear curvas van a dar problemas
-            [Eff_vector_1(n,:),Eff_vector_2(n,:)]=get_efficiency(best(1:best_idx),NIND);
+        for n=1:N_EXPERIMENTS
+            [Best_vector(n), best,last_gen(n,:),best_stop(n,:),S] = run_ga_return(x, y, NIND,... 
+            MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS,STOP_CRIT);
+            % S(end)
+            
+            % % last_gen
+            % % best_stop
+            % best_idx=max(last_gen(n,:));
+            % %%Si queremos plotear curvas van a dar problemas
+            % [Eff_vector_1(n,:),Eff_vector_2(n,:)]=get_efficiency(best(1:best_idx),NIND);
 
         end
-
-        % last_gen(:,1)
-        % best_stop(:,1)
-
         %%Updating table
         Results.Test_id(i)=i;
         Results.Last_eq(i)=ceil(mean(last_gen(:,1)));
         Results.Av_Best_eq(i)=mean(best_stop(:,1));  
         Results.Last_div(i)=ceil(mean(last_gen(:,2)));
-        Results.Av_Best_div(i)=mean(best_stop(:,2));
+        Results.Av_Best_div(i)=mean(best_stop(:,2))
         % Results.Last_div(i)=ceil(mean(last_gen(:,3)));
         % Results.Av_Best_div(i)=mean(best_stop(:,3));
 
-        % Results
-
-
-        %%Computing Av.results
-        Av_Best=mean(Best_vector);
-        Peak_Best=min(Best_vector); %The lower the fitness, the better
-        Best_vector_inv=1./(Best_vector); %%Transforming fitness
-        Fit_var=var(Best_vector_inv);
-        Eff_vector_final_1=mean(Eff_vector_1); %%Final gr. efficiency haciendo av. efficiency de cada experimento
-        Eff_vector_final_2=mean(Eff_vector_2); %%Final gr. efficiency haciendo av. efficiency de cada experimento
-        %%Saving curvas efficiency
-        Eff_structure.curve_1{i}=Eff_vector_final_1;
-        Eff_structure.curve_2{i}=Eff_vector_final_2;
-
-        % %%Updating Results Table
-        % Results.NIND(i)=NIND;
-        % Results.ELITIST(i)=ELITIST;
-        % Results.PR_CROSS(i)=PR_CROSS;
-        % Results.PR_MUT(i)=PR_MUT;
-        % Results.Av_Best(i)=Av_Best;
-        % Results.Peak_Best(i)=Peak_Best; %%Me olvidaria del peak best
-        % Results.Fit_var(i)=Fit_var;
-        % Results.Eff_1(i)=sum(Eff_vector_final_1); %%Area bajo la curva eff1
-        % fprintf("Finished iter no. %d , %d iter remaining \n",(i,length(par_table)))
-        disp("Finished iteration")
+        fprintf("Finished iter no. %d , %d iter remaining \n",i,height(par_comb))
 
     end
-
-
 
     %%Saving Table to file
     writetable(Results,test_table_path)
     %%Saving efficiency curves
-    save(eff_path,'Eff_structure')
+    % save(eff_path,'Eff_structure')
     end
