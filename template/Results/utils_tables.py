@@ -28,8 +28,21 @@ def get_new_tablename(table_name,process_type):
 pass
 
 
-def rank_tables(table_list,criteria):
-    return
+def rank_tables(tables,tables_path,parameters,criteria,n):
+    #Reading tables
+    table_list=[pd.read_csv(os.path.join(tables_path,table)) for table in tables]
+    #Getting parameters
+    rank_table=table_list[0].copy()
+
+    rank_table=rank_table[parameters] ###Poner esto bien
+    #Summing all criteria columns
+    criteria_list=[el[criteria] for el in table_list]
+    criteria_sum=sum(criteria_list)
+    #Appending total criteria column to rank table
+    rank_table=pd.concat([rank_table,criteria_sum],axis=1)
+    #Ranking
+    rank_table=rank_table.sort_values("M",ascending=False)
+    return rank_table[:n] ## devolver los n mejores
 
 
 def normalise_metrics(metric_list,res_table):
