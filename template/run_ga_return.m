@@ -57,12 +57,13 @@ function [best_fitness, best,last_gen,best_stop,S] = run_ga_return(x, y, NIND, M
     eq_fit_gen=0;%%Contador de # equal fitness generations
 
 
-    S_aux=7.5;
+    S_aux=1000;
+
     cont_s=0;
 
     %%Initialization best_stop
     % generational loop
-    while (gen<MAXGEN & ~(isequal(flags_vector,desired_flags)))
+    while (gen<MAXGEN && ~(isequal(flags_vector,desired_flags)))
         
         sObjV=sort(ObjV);
         best(gen+1)=min(ObjV);
@@ -77,41 +78,33 @@ function [best_fitness, best,last_gen,best_stop,S] = run_ga_return(x, y, NIND, M
        
 
         %%Stopping Criterias (Only checked in case we specify at least one stopping criteria)
-        if(~(STOP_CRIT=="false") & gen>0)
+        if(~(STOP_CRIT=="false") && gen>0)
         %%Eq number of fit evaluations
             if((best(gen)-best(gen+1)<=0) ) 
                 eq_fit_gen=eq_fit_gen+1;  
             else
                 eq_fit_gen=0;
             end
-            if((eq_fit_gen==15 && flags_vector(1)==false  && desired_flags(1)==true))
+            if((eq_fit_gen==10 && flags_vector(1)==false  && desired_flags(1)==true))
                 last_gen(1)=gen+1;
                 flags_vector(1)=true; 
             
             end
-            %%Efficiency criteria
-            %%Sacar absolute best
-            % %%threshold %% creo que me la pela este criterio.
-            % threshold=0.0005; %%Mejora un 1%
-            % if(((best(gen+1)>(1/(1+threshold))*best(gen)) &&  flags_vector(2)==false && desired_flags(2)==true))
-            %     last_gen(2)=gen+1;
-            %     flags_vector(2)=true;    
-            % end
+           
             %%Diversity threshold
             %%Get av_ diversity
-            S(gen)=calc_av_diversity(Chrom);
-            if(S(gen)~=S_aux)
-                S_aux=S(gen);
+            S=calc_av_diversity(Chrom);
+            if(S<S_aux)
+                S_aux=S;
                 cont_s=0;
             else
                 cont_s=cont_s+1;
             end
-            if(cont_s>5 &&  flags_vector(2)==false && desired_flags(2)==true) 
+            if(cont_s>=20 &&  flags_vector(2)==false && desired_flags(2)==true) 
                 last_gen(2)=gen+1;
-                % best_stop(3)=min(best(1:last_gen(3)));
                 flags_vector(2)=true;    
             end
-        end
+        end 
 
         %assign fitness values to entire population
         FitnV=ranking(ObjV);

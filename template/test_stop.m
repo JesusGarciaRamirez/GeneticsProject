@@ -33,7 +33,7 @@ function test_stop(x,y,NVAR,dataset_file,test_table,STOP_CRIT)
     %%Table
     Initialization=zeros(1,5);
     Results = array2table(Initialization,'VariableNames',{'Test_id',...
-                            'Av_Best_eq','Last_eq','Av_Best_div','Last_div'});
+                                        'Av_Best_eq','Last_eq','Av_Best_div','Last_div'});
     %%Performing Tests
     for i=1:(height(par_comb))
         %%Loading parameter combination i from structure par_comb
@@ -42,11 +42,15 @@ function test_stop(x,y,NVAR,dataset_file,test_table,STOP_CRIT)
         PR_CROSS=par_comb.PR_CROSS(i);
         PR_MUT=par_comb.PR_MUT(i);
         %%Performing n set of equal experiments
+
+        start_time=cputime;
         for n=1:N_EXPERIMENTS
             [Best_vector(n), best,last_gen(n,:),best_stop(n,:),S] = run_ga_return(x, y, NIND,... 
             MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS,STOP_CRIT);
+            fprintf("Finished iter no. %d , %d iter remaining \n",n,N_EXPERIMENTS)
+
             % S(end)
-            
+
             % % last_gen
             % % best_stop
             % best_idx=max(last_gen(n,:));
@@ -54,6 +58,8 @@ function test_stop(x,y,NVAR,dataset_file,test_table,STOP_CRIT)
             % [Eff_vector_1(n,:),Eff_vector_2(n,:)]=get_efficiency(best(1:best_idx),NIND);
 
         end
+        elapsed=cputime - start_time;
+        fprintf("time elapsed = %f",elapsed)
         %%Updating table
         Results.Test_id(i)=i;
         Results.Last_eq(i)=ceil(mean(last_gen(:,1)));
