@@ -15,8 +15,11 @@ N_EXPERIMENTS = 10;
 N_SAME_OP_EXPERIMENTS = 20;
 PRMUT_INTERVAL = [0,.2];
 PRCROSS_INTERVAL = [.5,1];
+
+
 CROSS_OP = ["cross_mix","cross_ERX","cross_OX","cross_rand_sequential_constructive","cross_sequential_constructive"];
 MUT_OP = ["mut_mix","mut_inverse3","mut_PSM","mut_RSM"];
+
 
 %Casteamos a variables categoricas para poder meter estos parametros en la tabla
 CROSS_OP_cat=categorical(CROSS_OP);
@@ -84,7 +87,7 @@ for i=1:length(CROSS_OP)
             Results.Peak_Best(cont)=Peak_Best; %%Me olvidaria del peak best
 
             % Results.Fit_var(cont)=Fit_var;
-            Results.Eff_1(cont)=sum(Eff_vector_final_1)*100 %%Area bajo la curva eff1, metrica ab de efficiency
+            Results.Eff_1(cont)=sum(Eff_vector_final_1) %%Area bajo la curva eff1, metrica ab de efficiency
 
             % Results.Eff_2(cont)=sum(Eff_vector_final_2); %%Esta variable no aporta nada en la tabla
             % Total: 5 * 4 * N_SAME_EXP * N_EXP = 400 iterations
