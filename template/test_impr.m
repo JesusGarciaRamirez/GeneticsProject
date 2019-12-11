@@ -5,16 +5,16 @@ function test_impr(x,y,NVAR,dataset_file)
 %
 % Long description
 
-MAXGEN=50;		% Maximum no. of generations
+MAXGEN=150;		% Maximum no. of generations
 STOP_PERCENTAGE=1;    % percentage of equal fitness individuals for stopping
-NIND = 100;
+NIND = 50;
 ELITIST = .1;
-STOP_EPOCHS = 100;
-N_EXPERIMENTS = 10;
-PR_MUT = .1;
-PR_CROSS = .8;
-CROSS_OP = "cross_OX";
-MUT_OP = "mut_PSM";
+STOP_EPOCHS = 150;
+N_EXPERIMENTS = 20;
+PR_MUT = .2;
+PR_CROSS = .9;
+CROSS_OP = "cross_sequential_constructive";
+MUT_OP = "mut_RSM";
 IMPR = ["impr1","impr2","impr3","impr4","impr5",""];
 
 %Casteamos a variables categoricas para poder meter estos parametros en la tabla
@@ -54,7 +54,6 @@ for i=1:length(IMPR)
         Eff_vector_1(n,:)=get_efficiency(best,NIND);
         nimprovements = nimprovements + sum(improvements);
     end
-    nimprovements
     cont=cont+1;
     Av_Best=mean(Best_vector);
     Peak_Best=min(Best_vector); %The lower the fitness, the better
