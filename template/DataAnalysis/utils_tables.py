@@ -50,42 +50,11 @@ def unit_transform(column,inv=False):
 #Cleaning
 
 ##Cleaning
-def process_tuning_tables(tuning_folder,exp_type):
-    #Getting result tables
-    finetune_list=[table for table in os.listdir(tuning_folder) if exp_type in table]
-    
-    finetune_dict={}
-    for table in finetune_list:
-        #open table
-        df=pd.read_csv(os.path.join(tuning_folder,table))
-        
-        #Cleaning
-        df=df.drop(columns=["CROSS","MUT","PR_MUT","Eff_1"])
 
-        #Av_Best (1/Av)
-        df["Av_Best"]=df["Av_Best"].apply(lambda x: 1/x)
-        #Normalize cols
-        metric_list=["Av_Best"]
-        df=normalise_metrics(metric_list,df)
-        #Create and concatenate Dataset Col
-        #Getting dataset name    
-        name, _ = os.path.splitext(table) 
-        name_head="Results_"+ exp_type
-        dataset_name=name.split(name_head)[1]
-
-        test_set=pd.Series([dataset_name for i in range(len(df))],name="Dataset")
-        df=pd.concat([test_set, df],axis=1)
-
-        #append
-        finetune_dict[table]=df
-        #clear
-        del df, test_set
-
-    return finetune_dict
 
 class table_class(object):
     """docstring for ClassName."""
-    def __init__(self,table_file,dir_folder, exp_type,cols,metric_list):
+    def __init__(self,table_file,dir_folder, exp_type,metric_list,cols=""):
         self.table_file=table_file
         self.exp_type=exp_type
         self.cols=cols
@@ -104,9 +73,45 @@ class table_class(object):
         dataset_name=self.get_dataset_name()
         return pd.Series([dataset_name for i in range(len(self.dataframe))],name="Dataset")
 
+def create_tables(dir_folder,metric_list,exp_type=""):
+    class_name_list=[name for name in os.listdir(dir_folder) if exp_type in name]
+    #create class_list (as dict)
+    class_dict={}
 
+    for class_name in class_name_list:
+        class_dict[class_name] = table_class(class_name,dir_folder,exp_type,metric_list)
+        
+    return class_dict
+def get_best_parameters(df,par_type): #Par_type can be "CROSSOVER" or "MUT"
+    # #Make copy to work with
+    df_copy=df.copy()
+    #Sorting and selecting 
+    df_copy=df_copy.sort_values("CritSum",ascending=False)
+    best_cross_counts=df_copy[par_type][:50].value_counts()
+    return best_cross_counts.keys()
 
-def table_pipeline(tables_dict):
+def table_pipeline_basic(tables_dict,drop=True):
+    
+    df_dict={}
+    for key in tables_dict:
+            #open table
+            df=tables_dict[key].dataframe.copy()
+            #Cleaning
+            if(drop==True):
+                df=df.drop(columns=tables_dict[key].cols)
+            #Normalize cols
+            df=normalise_metrics(df,tables_dict[key].metric_list)
+            #Create Dataset & Sum of Metrics Col
+            df["Dataset"]=df.apply(lambda row: tables_dict[key].name, axis=1)
+            df["CritSum"]= df.apply(lambda row: (0.5*(row["Av_Best_unit"]+row["Eff_1_unit"])), axis=1)
+            #append finalt table to dict
+            df_dict[tables_dict[key].name]=df
+            #Appending process df to the object
+            tables_dict[key].dfprocess=df
+            
+    return df_dict
+
+def table_pipeline_tuning(tables_dict):
     
     df_dict={}
     for key in tables_dict:
@@ -126,17 +131,18 @@ def table_pipeline(tables_dict):
             
     return df_dict
 
+def crop_table_best(tables_dict):
+    df_dict={}
+    for key in tables_dict.keys():
+        df=tables_dict[key].copy()
+        # #Getting best_cross 
+        best_cross=get_best_parameters(df,"CROSS")
+        df=df[df["CROSS"].isin(best_cross)]
+        #append
+        df_dict[key]=df
+    return df_dict
+        
 
-def stack_datasets_tables(tables_dict):
-    #Create table combining results across datasets
-    for i,key in enumerate(tables_dict.keys()):
-        if(i==0):
-            def_table=tables_dict[key]
-        else:
-            def_table=def_table.append(tables_dict[key])
-
-    return def_table
-    pass
 ##Plotting
 # library
 from mpl_toolkits.mplot3d import Axes3D

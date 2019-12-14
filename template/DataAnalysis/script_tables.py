@@ -44,36 +44,8 @@ def process_table_basic(table_name):
     norm_table.to_csv(table_path)
     print("Correctly saved table  {0}".format(table_name))
 
-def get_best_parameters(tuning_table,par_type): #Par_type can be "CROSSOVER" or "MUT"
-    # #Make copy to work with
-    # tuning_copy=tuning_table.copy()
-    #Sorting and selecting 
-    tuning_table=tuning_table.sort_values("Av_Best",ascending=False)
-    best_cross_counts=tuning_table[par_type][:50].value_counts()
-    return best_cross_counts.keys()
-
 ##Process Tuning Tables
 
-table_list=[table for table in os.listdir(tuning_folder) if "csv" in table]
-print(table_list)
-tuning_dict={}
-for table in table_list:
-    #open table
-    tuning_table=pd.read_csv(os.path.join(tuning_folder,table))
-    
-    #Av_Best (1/Av)
-    tuning_table["Av_Best"]=tuning_table["Av_Best"].apply(lambda x: 1/x)
-    #Normalize cols
-    metric_list=["Av_Best"]
-    tuning_table=normalise_metrics(metric_list,tuning_table)
-
-    # #Getting best_cross 
-    best_cross=get_best_parameters(tuning_table,"CROSS")
-    tuning_table=tuning_table[tuning_table["CROSS"].isin(best_cross)]
-    #append
-    tuning_dict[table]=tuning_table
-    #clear
-    del tuning_table
 
 
 

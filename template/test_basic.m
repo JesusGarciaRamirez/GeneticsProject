@@ -88,9 +88,6 @@ for i=1:length(NIND)
                     
                     %%Saving fitness/epochs results (Depends on type of exp)
                     if(exp_type=="scal")
-                        ELITIST
-                        PR_CROSS
-                        PR_MUT
                         running_res.best{i}=mean(best);
                     end
                     %%"Appending" the results in a new row
