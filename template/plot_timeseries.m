@@ -1,7 +1,7 @@
 function plot_timeseries(result_struct_file,NIND_vect)
 
 
-[ ~,filename, ~]=fileparts(result_struct_file)
+[ ~,filename, ~]=fileparts(result_struct_file);
 strSplit=split(filename,'_');
 Dataset_name=char(strSplit(3));
 

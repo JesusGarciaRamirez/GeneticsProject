@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import numpy as np
+from scipy.io import loadmat
 
 import seaborn as sns
 from pathlib import Path
@@ -9,6 +10,21 @@ from pathlib import Path
 # tables=[table for table in os.listdir(current_path) if "csv" in table]
 
 
+
+
+class cd:
+    """Context manager for changing the current working directory"""
+    def __init__(self, newPath):
+        self.newPath = os.path.expanduser(newPath)
+
+    def __enter__(self):
+        self.savedPath = os.getcwd()
+        os.chdir(self.newPath)
+
+    def __exit__(self, etype, value, traceback):
+        os.chdir(self.savedPath)
+
+#Table functions
 def get_new_tablename(table_name,process_type):
     path=Path(table_name)
     new_path=path.with_name(path.stem+ "_"+process_type +path.suffix)
@@ -141,29 +157,75 @@ def crop_table_best(tables_dict):
         #append
         df_dict[key]=df
     return df_dict
+            
+
         
+##Auxiliary functions to work with .mat files(timeseries)
+def load_matlab_ts(matfile,matfolder,Heur=False):
+    """Aux function to load Running res struct from .mat files
+        as a pandas df"""
+    mat_str = loadmat(os.path.join(matfolder,matfile))
+    NIND_vector=[20,50,80,100,120]
+    items=[item for item in mat_str['running_res'][0][0]]
+    fit_values=[items[1].flat[i] for i in range(items[1].shape[1])]
+    # Data
+    #Create dict from ts data
+    ts_dict={}
+    ts_dict["epoch"]=range(fit_values[1].shape[1])
 
-##Plotting
-# library
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
+    # for i,NIND in enumerate(NIND_vector):
+    #     if(Heur==True):
+    #         #Heuristics case : each col is fit values for each impr (same NIND)
+    #         ts_dict["IMPR{0}".format(i)]=fit_values[i].flatten()
+    #     else:
+    #         ##Basic case /Stop criteria/Tuning case: each col is fit values for NIND 
+    #         ts_dict["{0}".format(NIND)]=fit_values[i].flatten()
 
-def plot_3d(res_table,x,y,z):
-    # Make the plot
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.plot_trisurf(res_table[y], res_table[x], res_table[z], cmap=plt.cm.viridis, linewidth=0.2)
-    plt.show()
+    if(Heur==True):
+        for i in range(len(fit_values)):
+            ts_dict["IMPR{0}".format(i)]=fit_values[i].flatten()
+
+    else:
+        for NIND in NIND_vector:
+            ts_dict["{0}".format(NIND)]=fit_values[i].flatten()
+
+    return pd.DataFrame(ts_dict)
+
+
+def import_ts_data(scal_path,Heur=False): #Get dict with ts results(values) for each dataset(keys) in scal dir (eg.Tuning)
+
+    ts_files=[file for file in os.listdir(scal_path) if ("Running_Res" in file) and  (".mat" in file)]
+    dict_ts={}
+    for file in ts_files:
+        Dataset=file.split("Running_Res")[1].split("_")[1]
+        dict_ts[Dataset]=load_matlab_ts(file,scal_path,Heur)
+    return dict_ts
     
-    # to Add a color bar which maps values to colors.
-    surf=ax.plot_trisurf(res_table[y], res_table[x], res_table[z], cmap=plt.cm.viridis, linewidth=0.2)
-    fig.colorbar(surf, shrink=0.5, aspect=5)
-    plt.show()
+def get_scal_heuristics(epochs,ts_files,scal_path,IMPR="IMPR4"):
+    NIND_arr=[20,50,80,100,120]
+    df_dict={}
+    df_dict["epoch"]=range(epochs)
+    for el in zip(ts_files,NIND_arr):
+        matfile=el[0]
+        NIND=el[1]
+        ts_df=load_matlab_ts(matfile,scal_path,Heur=True)
+        y=pd.Series(ts_df[IMPR],name="y")
+        df_dict["y_{0} ind".format(NIND)]=y
+        del ts_df
+    return pd.DataFrame(df_dict)
+
+def plot_ts_scal(Dataset,dict_ts,ax):
+#     matfile=next((s for s in ts_files if Dataset in s), None)
+#     ts_df=load_matlab_ts(matfile,scal_path,Heur=False)
+    ts_df=dict_ts[Dataset]
     
-    # Rotate it
-    ax.view_init(30, 45)
-    plt.show()
+    for col in ts_df.columns[1:]:
+        ax.plot( 'epoch', col, data=ts_df, marker='', linewidth=1.5)
+        
+    ax.set(xlabel='Epochs', ylabel='Fitness',
+       title=" Results {0}".format(Dataset))
     
-    # Other palette
-    ax.plot_trisurf(res_table[y], res_table[x], res_table[z], cmap=plt.cm.jet, linewidth=0.01)
-    plt.show()
+    ax.grid(True)
+    ax.legend()
+    
+    

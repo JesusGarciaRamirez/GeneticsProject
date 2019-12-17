@@ -30,6 +30,8 @@ PR_MUT=parameters.PR_MUT;
 IMPR=parameters.IMPR;
 MUT_OP=parameters.MUT_OP;
 CROSS_OP=parameters.CROSS_OP;
+base_dir=parameters.base_dir; %%Path to save the results
+
 
 
 %Casteamos a variables categoricas para poder meter estos parametros en la tabla
@@ -38,7 +40,7 @@ IMPR_cat=categorical(IMPR);
 
 %%Name of the file to save table from experiment i
 [ ~,filename, ~]=fileparts(dataset_file);
-table_path=sprintf("Heuristics/Results_%s_Heur.csv",filename);
+table_path=sprintf("%s/Results_%s.csv",base_dir,filename);
 
 eff_path=sprintf("Heuristics/Eff_str%s.mat", filename);
 
@@ -60,7 +62,7 @@ Eff_vector_1=zeros(N_EXPERIMENTS,MAXGEN);
 %%Running Results
 running_res=struct;
 running_res.IMPR=IMPR;
-running_results_path=sprintf("Heuristics/Running_Res_%s.mat", filename);
+running_results_path=sprintf("%s/Running_Res_%s.mat",base_dir, filename);
 
 %%Preallocation
 best=zeros(N_EXPERIMENTS,MAXGEN);

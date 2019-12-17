@@ -1,4 +1,4 @@
-%% Def parameters as a structure
+z%% Def parameters as a structure
 
 parameters.MAXGEN=50;		% Maximum no. of generations
 parameters.STOP_PERCENTAGE=1;    % percentage of equal fitness individuals for stopping
