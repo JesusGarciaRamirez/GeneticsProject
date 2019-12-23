@@ -37,7 +37,8 @@ def rank_tables(df_dict,parameters,criteria="CritSum",n=3):
     criteria_list=[el[criteria] for el in df_dict.values()]
     criteria_sum=sum(criteria_list)
     
-    rank_table=df_dict[next(iter(df_dict))].copy()[parameters]
+    rank_table=df_dict["rondrit127"].copy()[parameters]
+
     rank_table=pd.concat([rank_table,criteria_sum],axis=1).sort_values(criteria,ascending=False)[:3]
     return rank_table
 
@@ -98,6 +99,7 @@ def create_tables(dir_folder,metric_list,exp_type=""):
         class_dict[class_name] = table_class(class_name,dir_folder,exp_type,metric_list)
         
     return class_dict
+
 def get_best_parameters(df,par_type): #Par_type can be "CROSSOVER" or "MUT"
     # #Make copy to work with
     df_copy=df.copy()
