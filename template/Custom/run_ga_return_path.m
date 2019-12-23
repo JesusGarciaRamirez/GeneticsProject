@@ -1,4 +1,4 @@
-function [best_fitness, best, improvement, standd_mean, average_distance, average_numequals] = run_ga_return_path(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, MUTATION, LOCALLOOP, STOP_EPOCHS, CROWDING)
+function [best_fitness, best, improvement, standd_mean, distance, average_numequals, times] = run_ga_return_path(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, MUTATION, LOCALLOOP, STOP_EPOCHS, CROWDING, MAX_TIME, MEASURE_DIST)
 % usage: run_ga(x, y, 
 %               NIND, MAXGEN, NVAR, 
 %               ELITIST, STOP_PERCENTAGE, 
@@ -19,7 +19,8 @@ function [best_fitness, best, improvement, standd_mean, average_distance, averag
 % CROWDING: determines if deterministic crowding will be used. if
 % activated, deactivates ELITISM
 % calculate distance matrix between each pair of cities
-%
+% MAXTIME: the maximum time the algorithm may run. If 0, infinite
+% MEASURE_DIST: wether we must measure the distance among paths or not
 %{NIND MAXGEN NVAR ELITIST STOP_PERCENTAGE PR_CROSS PR_MUT CROSSOVER LOCALLOOP}
 
     if CROWDING
@@ -29,6 +30,7 @@ function [best_fitness, best, improvement, standd_mean, average_distance, averag
     mean_fits=zeros(1,MAXGEN+1);
     worst=zeros(1,MAXGEN+1);
     improvement=zeros(1,MAXGEN);
+    distance = zeros(1,MAXGEN);
     % dist has the values of the distances between cities
     Dist=zeros(NVAR,NVAR);
     for i=1:size(x,1)
@@ -48,11 +50,14 @@ function [best_fitness, best, improvement, standd_mean, average_distance, averag
     ObjV = tspfun_path(Chrom,Dist);
     best=NaN(1,MAXGEN);
     standd =NaN(1,MAXGEN);
-    average_distance_vector = NaN(1,MAXGEN);
     numEquals = NaN(1,MAXGEN);
     % counter of epochs without chenge in the fittest
     change_cont = 0;
     
+    tic
+    times = [];
+    
+
     % generational loop
     while gen<MAXGEN
         
@@ -100,15 +105,28 @@ function [best_fitness, best, improvement, standd_mean, average_distance, averag
         end
         
         %Check average distance between paths
-        [average_distance_vector(gen+1), numEquals(gen+1)] = average_distance_chromosomes(Chrom); %%Erasable
+        if MEASURE_DIST
+            [distance(gen+1), numEquals(gen+1)] = average_distance_chromosomes(Chrom); %%Erasable
+        end
         
         [Chrom, improvement(gen+1)] = tsp_ImprovePopulation_path(NIND, ObjV, Chrom,LOCALLOOP,Dist);
+        
         %increment generation counter
-        gen=gen+1;    
+        gen=gen+1; 
+        
+        % If plotting with MAX_TIME, do not consider MAX_GEN
+        if MAX_TIME > 0
+            MAXGEN = MAXGEN + 1;
+        end
+        
+        aux = toc;
+        times = [times, aux];
+        if MAX_TIME > 0 && toc > MAX_TIME
+            break;
+        end
         
     end
     best_fitness = min(best);
     standd_mean = mean(standd);
-    average_distance = mean(average_distance_vector);
     average_numequals = mean(numEquals);
 end
