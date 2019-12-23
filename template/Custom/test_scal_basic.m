@@ -23,9 +23,8 @@ PR_MUT=parameters.PR_MUT;
 
 %%Name of the file to save table from experiment i
 [ ~,filename, ~]=fileparts(dataset_file);
-% rank_table_path=['Ap1/Results_scal' filename '.csv']
 
-rank_table_path=sprintf("Ap1/Results_scal%s.csv",filename)
+rank_table_path=sprintf("Ap1/Results_scal%s.csv",filename);
 
 %%Read table with parameter combinations
 %%Read the normalised table and extract the parameter to perform anova

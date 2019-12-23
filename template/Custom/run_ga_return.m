@@ -1,5 +1,5 @@
-function [best_fitness, best,last_gen,best_stop,S] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,... 
-    STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS,STOP_CRIT)
+function [best_fitness, best,last_gen] = run_ga_return(x, y, NIND, MAXGEN, NVAR, ELITIST,... 
+    F_OPT, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS,StopCriteria)
 % usage: run_ga(x, y, 
 %               NIND, MAXGEN, NVAR, 
 %               ELITIST, STOP_PERCENTAGE, 
@@ -41,29 +41,16 @@ function [best_fitness, best,last_gen,best_stop,S] = run_ga_return(x, y, NIND, M
         %Chrom(row,:)=randperm(NVAR);
     end
     gen=0;
-    % number of individuals of equal fitness needed to stop
-    stopN=ceil(STOP_PERCENTAGE*NIND);
+    
     % evaluate initial population
     ObjV = tspfun(Chrom,Dist);
     best=zeros(1,MAXGEN);
-   
-    %%Vector for storing last gen using stopping criterion i
-    last_gen=MAXGEN *ones(1,2);
-    %%Flags for stopping criteria
-    flags_vector=logical(zeros(1,2));
-    %%Desired flags : "Definir esto bien" en este ejemplo queremos que se cumplan todas las stop conditions
-    desired_flags=get_flags(STOP_CRIT);
-    
-    eq_fit_gen=0;%%Contador de # equal fitness generations
 
-
-    S_aux=1000;
-
-    cont_s=0;
-
+    Stop=0;
+    N=25;%Wait 25 gen before checking StopCrit 
     %%Initialization best_stop
     % generational loop
-    while (gen<MAXGEN && ~(isequal(flags_vector,desired_flags)))
+    while (Stop~=1 && gen<=MAXGEN)
         
         sObjV=sort(ObjV);
         best(gen+1)=min(ObjV);
@@ -75,36 +62,8 @@ function [best_fitness, best,last_gen,best_stop,S] = run_ga_return(x, y, NIND, M
                 break;
             end
         end
-       
-
-        %%Stopping Criterias (Only checked in case we specify at least one stopping criteria)
-        if(~(STOP_CRIT=="false") && gen>0)
-        %%Eq number of fit evaluations
-            if((best(gen)-best(gen+1)<=0) ) 
-                eq_fit_gen=eq_fit_gen+1;  
-            else
-                eq_fit_gen=0;
-            end
-            if((eq_fit_gen==10 && flags_vector(1)==false  && desired_flags(1)==true))
-                last_gen(1)=gen+1;
-                flags_vector(1)=true; 
-            
-            end
-           
-            %%Diversity threshold
-            %%Get av_ diversity
-            S=calc_av_diversity(Chrom);
-            if(S<S_aux)
-                S_aux=S;
-                cont_s=0;
-            else
-                cont_s=cont_s+1;
-            end
-            if(cont_s>=20 &&  flags_vector(2)==false && desired_flags(2)==true) 
-                last_gen(2)=gen+1;
-                flags_vector(2)=true;    
-            end
-        end 
+        %%Stopping Criteria
+        Stop = get_stop_criteria(Chrom, best, StopCriteria, N,F_OPT,MAXGEN);
 
         %assign fitness values to entire population
         FitnV=ranking(ObjV);
@@ -127,30 +86,8 @@ function [best_fitness, best,last_gen,best_stop,S] = run_ga_return(x, y, NIND, M
         
     end
 
-    best_stop=zeros(1,2);
-    for i=1:length(last_gen)
-        best_stop(i)=min(best(1:last_gen(i)));
-    end 
-    % ending = min(gen+1, MAXGEN); %% Number of generations performed before reaching stopping criteria 
-    best_fitness = min(best);
+    last_gen=gen; %% Number of generations performed before reaching stopping criteria 
+
+    best_fitness = min(best(1:last_gen));
 end
-
-
-function desired_flags= get_flags(STOP_CRIT)
-    switch STOP_CRIT
-        case "Equal"
-            desired_flags=logical([1,0]);
-        % case "Eff"
-        %     desired_flags=logical([0,1,0]);
-        case "Diversity"
-            desired_flags=logical([0,1]);
-        otherwise
-            desired_flags=logical(ones(1,2));
-    end
-        
-end
-
-
-
-
 

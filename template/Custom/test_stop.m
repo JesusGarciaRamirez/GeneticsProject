@@ -1,80 +1,78 @@
-function test_stop(x,y,NVAR,dataset_file,test_table,STOP_CRIT)
+function test_stop(x,y,NVAR,parameters,dataset_file,rank_table)
     %myFun - Description
     %
     % Syntax: output = myFun(input)
     %   test_table =parameter combinations to test the stopping criterion i
     % Long description
 
-    %%Fixed parameters 
-    MAXGEN=100;% Maximum no. of generations
-    LOCALLOOP = 0;    %%Quitar local loop
-    N_EXPERIMENTS = 20;
-    STOP_PERCENTAGE=1;
-    CROSSOVER = 'xalt_edges';  % default crossover operator
-    STOP_EPOCHS = 100;
+   
+    
+    %%Loading Parameters
+    MAXGEN=parameters.MAXGEN;		% Maximum no. of generations
+    STOP_PERCENTAGE=parameters.STOP_PERCENTAGE;    % percentage of equal fitness individuals for stopping
+    NIND =parameters.NIND;
+
+    LOCALLOOP = parameters.LOCALLOOP;    %%Quitar local loop
+    STOP_EPOCHS = parameters.STOP_EPOCHS;
+    CROSSOVER=parameters.CROSSOVER;
+    N_EXPERIMENTS = parameters.N_EXPERIMENTS;
+    Criteria_list=["Crit1","Crit2","Crit3","Crit4","Crit5"];
+
+
 
     %%Name of the file to save table from experiment i
     [ ~,filename, ~]=fileparts(dataset_file);
-    test_table_path=['Results/Results_stop' filename '.csv'];
-    
-    % eff_path=sprintf("Stop/Eff_stop_str%s.mat", filename);
-    % %%Structure to save efficiency curves
-    % Eff_structure=struct;
-    % % Eff_vector_1=zeros(N_EXPERIMENTS,MAXGEN);
-    % % Eff_vector_2=zeros(N_EXPERIMENTS,MAXGEN);
-    % Best_vector=zeros(1,N_EXPERIMENTS);
-    
+
+
     %%Read table with parameter combinations
     %%Read the normalised table and extract the parameter to perform anova
-    table_path= ['Results/' test_table];
-    assert(isfile(table_path),"Wrong table path");
-    par_comb=readtable(table_path);
+    table_path=sprintf("Ap1/%s",rank_table); 
 
-    %%Table
-    Initialization=zeros(1,5);
-    Results = array2table(Initialization,'VariableNames',{'Test_id',...
-                                        'Av_Best_eq','Last_eq','Av_Best_div','Last_div'});
+    assert(isfile(table_path),"Wrong table path");
+
+    par_comb=readtable(table_path);
+                  
     %%Performing Tests
     for i=1:(height(par_comb))
         %%Loading parameter combination i from structure par_comb
-        NIND=par_comb.NIND(i);
+        % NIND=par_comb.NIND(i);
         ELITIST=par_comb.ELITIST(i);
         PR_CROSS=par_comb.PR_CROSS(i);
         PR_MUT=par_comb.PR_MUT(i);
-        %%Performing n set of equal experiments
+        %%Get F_Opt
+        F_Opt=0.9*par_comb.Av_Best;
 
-        start_time=cputime;
-        for n=1:N_EXPERIMENTS
-            [Best_vector(n), best,last_gen(n,:),best_stop(n,:),S] = run_ga_return(x, y, NIND,... 
-            MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS,STOP_CRIT);
-            fprintf("Finished iter no. %d , %d iter remaining \n",n,N_EXPERIMENTS)
+        %%Table
+        stop_table_path=sprintf("Stop/Results_stop%d.csv",i);
 
-            % S(end)
+        StopCrit = "";Av_Best=0;Last_gen=0;
+        Results = table(Last_gen,Av_Best,StopCrit);
 
-            % % last_gen
-            % % best_stop
-            % best_idx=max(last_gen(n,:));
-            % %%Si queremos plotear curvas van a dar problemas
-            % [Eff_vector_1(n,:),Eff_vector_2(n,:)]=get_efficiency(best(1:best_idx),NIND);
+        for STOP_CRIT=1:length(Criteria_list)
 
+            Best_vector=zeros(1,N_EXPERIMENTS);
+            last_gen=zeros(1,N_EXPERIMENTS);
+
+            %%Performing n set of equal experiments
+            for n=1:N_EXPERIMENTS
+                [Best_vector(n), ~,last_gen(n)] = run_ga_return(x, y, NIND,... 
+                MAXGEN, NVAR, ELITIST, F_Opt, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS,STOP_CRIT);
+                fprintf("Finished iter no. %d , %d iter remaining \n",n,N_EXPERIMENTS)
+                last_gen(n)
+            end
+
+            %%Updating table
+            Results.Last_gen(STOP_CRIT)=ceil(mean(last_gen));
+            Results.Av_Best(STOP_CRIT)=mean(Best_vector);  
+            Results.StopCrit(STOP_CRIT)=Criteria_list(STOP_CRIT)
+          
+      
         end
-        elapsed=cputime - start_time;
-        fprintf("time elapsed = %f",elapsed)
-        %%Updating table
-        Results.Test_id(i)=i;
-        Results.Last_eq(i)=ceil(mean(last_gen(:,1)));
-        Results.Av_Best_eq(i)=mean(best_stop(:,1));  
-        Results.Last_div(i)=ceil(mean(last_gen(:,2)));
-        Results.Av_Best_div(i)=mean(best_stop(:,2))
-        % Results.Last_div(i)=ceil(mean(last_gen(:,3)));
-        % Results.Av_Best_div(i)=mean(best_stop(:,3));
+        %%Saving Table to file
+        writetable(Results,stop_table_path)
+
 
         fprintf("Finished iter no. %d , %d iter remaining \n",i,height(par_comb))
 
     end
-
-    %%Saving Table to file
-    writetable(Results,test_table_path)
-    %%Saving efficiency curves
-    % save(eff_path,'Eff_structure')
     end

@@ -9,7 +9,7 @@ parameters.STOP_EPOCHS=150;
 parameters.N_EXPERIMENTS=10;
 parameters.SameExp=15;
 
-parameters.CROSSOVER='xalt_edges';
+parameters.CROSS_OP="cross_sequential_constructive";
 parameters.MUT_OP="mut_RSM";
 %%
 dataset_file='rondrit127.tsp';
