@@ -20,10 +20,8 @@ MAX_TIME = -1;
 MEASURE_DIST = 0;
 
 
-%CROSS_OP = ["cross_mix","cross_ERX","cross_OX","cross_rand_sequential_constructive","cross_sequential_constructive"];
-CROSS_OP = ["cross_rand_sequential_constructive","cross_sequential_constructive"];
-%MUT_OP = ["mut_mix","mut_inverse3","mut_PSM","mut_RSM"];
-MUT_OP = ["mut_RSM"];
+CROSS_OP = ["cross_mix","cross_ERX","cross_OX","cross_rand_sequential_constructive","cross_sequential_constructive"];
+MUT_OP = ["mut_mix","mut_inverse3","mut_PSM","mut_RSM"];
 
 
 %Casteamos a variables categoricas para poder meter estos parametros en la tabla
@@ -34,8 +32,7 @@ MUT_OP_cat=categorical(MUT_OP);
 
 %%Name of the file to save table from experiment i
 [ ~,filename, ~]=fileparts(dataset_file);
-%table_path=['Tuning/Results_' filename '.csv'];
-table_path=['Tuning/Erase_' filename '.csv'];
+table_path=['Tuning/Results_' filename '.csv'];
 eff_path=sprintf("Tuning/Eff_str%s.mat", filename);
 
 %Initializations
