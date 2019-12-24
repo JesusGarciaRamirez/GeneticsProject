@@ -15,10 +15,15 @@ N_EXPERIMENTS = 10;
 N_SAME_OP_EXPERIMENTS = 20;
 PRMUT_INTERVAL = [0,.2];
 PRCROSS_INTERVAL = [.5,1];
+CROWDING = 0;
+MAX_TIME = -1;
+MEASURE_DIST = 0;
 
 
-CROSS_OP = ["cross_mix","cross_ERX","cross_OX","cross_rand_sequential_constructive","cross_sequential_constructive"];
-MUT_OP = ["mut_mix","mut_inverse3","mut_PSM","mut_RSM"];
+%CROSS_OP = ["cross_mix","cross_ERX","cross_OX","cross_rand_sequential_constructive","cross_sequential_constructive"];
+CROSS_OP = ["cross_rand_sequential_constructive","cross_sequential_constructive"];
+%MUT_OP = ["mut_mix","mut_inverse3","mut_PSM","mut_RSM"];
+MUT_OP = ["mut_RSM"];
 
 
 %Casteamos a variables categoricas para poder meter estos parametros en la tabla
@@ -29,8 +34,8 @@ MUT_OP_cat=categorical(MUT_OP);
 
 %%Name of the file to save table from experiment i
 [ ~,filename, ~]=fileparts(dataset_file);
-table_path=['Tuning/Results_' filename '.csv'];
-
+%table_path=['Tuning/Results_' filename '.csv'];
+table_path=['Tuning/Erase_' filename '.csv'];
 eff_path=sprintf("Tuning/Eff_str%s.mat", filename);
 
 %Initializations
@@ -65,7 +70,7 @@ for i=1:length(CROSS_OP)
     for j=1:length(MUT_OP)
         for k=1:N_SAME_OP_EXPERIMENTS
             for n=1:N_EXPERIMENTS
-                [Best_vector(n), best] = run_ga_return_path(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS(k), PR_MUT(k), CROSS_OP(i), MUT_OP(j), LOCALLOOP, STOP_EPOCHS);
+                [Best_vector(n), best] = run_ga_return_path(x, y, NIND, MAXGEN, NVAR, ELITIST, STOP_PERCENTAGE, PR_CROSS(k), PR_MUT(k), CROSS_OP(i), MUT_OP(j), LOCALLOOP, STOP_EPOCHS, CROWDING, MAX_TIME, MEASURE_DIST);
                 [Eff_vector_1(n,:),Eff_vector_2(n,:)]=get_efficiency(best,NIND);
             end
             cont=cont+1;

@@ -47,9 +47,9 @@ function choice = choose(dist)
     l = length(dist);
     x = zeros(1,l);
     sum = 0;
-    x(1) = dist(1)*dist(1);
+    x(1) = 1/dist(1)*dist(1);
     for i=2:l
-        x(i) = x(i-1) + dist(i)*dist(i);
+        x(i) = x(i-1) + 1/dist(i)*dist(i);
         sum = sum + x(i);
     end
     r = rand(1,1)*sum;
