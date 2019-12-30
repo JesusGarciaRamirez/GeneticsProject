@@ -56,7 +56,7 @@ for i=1:length(IMPR)
     cont=cont+1;
 
     time_steps(i,:) = get_avg_time_graph(bests,times,MAX_TIME,SAMPLES_SEC);
-    running_res.best{i} = time_steps(i,:);
+    running_res.best = time_steps(i,:);
     
     Av_Best=mean(Best_vector);
     Peak_Best=min(Best_vector); %The lower the fitness, the better
@@ -68,11 +68,14 @@ for i=1:length(IMPR)
 
     % Results.Fit_var(cont)=Fit_var;
     Results.NImprovements(cont) = nimprovements
+    
+    name = sprintf("Heuristics/running_res_time_secs-%.2f_file-%s_%d.mat",MAX_TIME,dataset_file,i);
+    save(name','running_res')
+    
     fprintf("Finished iter no. %d \n",cont)
 end
 
-name = sprintf("Heuristics/running_res_time_secs-%.2f_file-%s.mat",MAX_TIME,dataset_file);
-save(name','running_res')
+
 
 %%Saving Table to file
 writetable(Results,table_path)
