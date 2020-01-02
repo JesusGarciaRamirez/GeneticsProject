@@ -73,9 +73,11 @@ for i=1:length(CROWDING)
     b = Best(i,:,:);
     Best_av(i,:) = mean(b);
     
-    running_res.best{i} = Best_av(i,:);
-    running_res.dist{i} = Distance_av(i,:);
+    running_res.best = Best_av(i,:);
+    running_res.dist = Distance_av(i,:);
 
+    name = sprintf("Crowding/running_res_crowding_file-%s-crowding-%d.mat",dataset_file,i);
+    save(name','running_res')
     fprintf("Finished iter no. %d \n",cont)
 end
 
@@ -106,9 +108,6 @@ legend(leg);
 title('Crowding best fitness')
 savefig('Crowding\crowding_best.fig');
 %}
-
-name = sprintf("Crowding/running_res_crowding_file-%s.mat",dataset_file);
-save(name','running_res')
 
 
 %%Saving Table to file
