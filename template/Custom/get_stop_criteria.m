@@ -6,17 +6,13 @@ function [Stop] = get_stop_criteria(Population, Fitness, StopCriteria, N,F_OPT,M
 % * Fitness: Array with the best fitness of each generation. Position
 % one has the best fitness of generation 1, and so on.
 % * StopCriteria: Can take the values 1, 2, 3 or 4:
-% 1 -> Stop if there has been a number of generations
-% (proportion of the total number of generations)
-% PROP_CASE1*length(Fitness) in which the fitness hasn't
-% change.
-% 2 -> Stop if there is a smaller (variance/mean) than
+% 1 -> Stop if there is a smaller (variance/mean) than
 % VAR_CASE2 in the last N generations.
-% 3 -> Stop if an optimal fitness level F_OPT is reached
-% 4 -> Number of generations reaches MaxGen
-% 5 -> Population diversity drops under
+% 2 -> Stop if an optimal fitness level F_OPT is reached
+% 3 -> Number of generations reaches MaxGen
+% 4 -> Population diversity drops under
 % POP_DIVERSITY*size(Population,1) [POP_DIV is a percentage]
-% 6 -> Average rate of improvement over last N generations
+% 5 -> Average rate of improvement over last N generations
 % drops under a given rate IMPROVEMENT_RATE_COEF*Max(fitness)
 % * N: Number of generations to check
 % Output:
@@ -24,7 +20,7 @@ function [Stop] = get_stop_criteria(Population, Fitness, StopCriteria, N,F_OPT,M
 
 
 PROP_CASE1 = 0.3; %Allowed number (proportion) of iterations with the same fitness.
-VAR_CASE2 = 0.3; %Allowed var/mean -> case 2
+VAR_CASE2 = 0.01; %Allowed var/mean -> case 2
 % F_OPT = nan; %Fitness optimal value -> case 3
 % MaxGen = nan; %Maximum number of generations -> case 4
 
@@ -36,33 +32,21 @@ if length(Fitness) >= N
     %Values to check of the Fitness (Fitness Last N-values)
     FitnessLN= Fitness((length(Fitness)-N+1):length(Fitness));
     switch StopCriteria
+           
         case 1
-            N_CASE1 = floor(length(Fitness)*PROP_CASE1);
-            %FitnessLN = Fitness to check
-            FitnessLN= Fitness((length(Fitness)-N_CASE1+1):length(Fitness));
-            lastVal = Fitness(length(Fitness));
-            if N_CASE1 > 1
-                Stop = 1;
-                for i = 1:length(FitnessLN)
-                    if FitnessLN(i) ~= lastVal
-                    Stop = 0;
-                    end
-                end
-            end
-        case 2
             if var(FitnessLN)/mean(FitnessLN) < VAR_CASE2
                 Stop = 1;
             
             end
-        case 3
+        case 2
             if Fitness(length(Fitness)) <= F_OPT
                 Stop = 1;
             end
 
-        % case 4
-        %     if length(Fitness) >= MaxGen
-        %         Stop = 1;
-        %     end
+        case 3
+            if length(Fitness) >= MaxGen
+                Stop = 1;
+            end
         case 4
             %Check how many different indiviuals are
             C = unique(Population,'rows');
@@ -74,7 +58,7 @@ if length(Fitness) >= N
                 Stop = 1;
             end
         otherwise
-            disp('Allowed values for StopCriteria: 1, 2, 3, 4, 5, 6.');
+            disp('Allowed values for StopCriteria: 1, 2, 3, 4, 5');
     end
 end
 end

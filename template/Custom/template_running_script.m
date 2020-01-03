@@ -12,10 +12,15 @@ parameters.SameExp=15;
 parameters.CROSSOVER='xalt_edges';
 parameters.MUT_OP="mut_RSM";
 %%
-dataset_file='rondrit127.tsp';
-[x,y,NVAR]=load_data(dataset_file);
-rank_table="Ap1_rank_table.csv";
-test_stop(x,y,NVAR,parameters,dataset_file,rank_table)
+dataset_file='rondrit016.tsp';
+dataset_list=["rondrit016.tsp","rondrit048.tsp","rondrit070.tsp","rondrit127.tsp"];
+
+for i=1:length(dataset_list)
+    dataset_file=dataset_list(i);
+    [x,y,NVAR]=load_data(dataset_file);
+    rank_table="Ap1_rank_table.csv";
+    test_stop(x,y,NVAR,parameters,dataset_file,rank_table)
+end
 %% Get intervals for parameters to be tuned
 exp_type="PR_CROSS";
 

@@ -50,7 +50,7 @@ function [best_fitness, best,last_gen] = run_ga_return(x, y, NIND, MAXGEN, NVAR,
     N=25;%Wait 25 gen before checking StopCrit 
     %%Initialization best_stop
     % generational loop
-    while (Stop~=1 && gen<=MAXGEN)
+    while (Stop~=1 && gen<=1000)
         
         sObjV=sort(ObjV);
         best(gen+1)=min(ObjV);
@@ -83,10 +83,9 @@ function [best_fitness, best,last_gen] = run_ga_return(x, y, NIND, MAXGEN, NVAR,
        
         %increment generation counter
         gen=gen+1;    
-        
     end
-
     last_gen=gen; %% Number of generations performed before reaching stopping criteria 
+    disp(last_gen)
 
     best_fitness = min(best(1:last_gen));
 end

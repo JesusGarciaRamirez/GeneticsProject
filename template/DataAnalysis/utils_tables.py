@@ -38,6 +38,8 @@ def rank_tables(df_dict,parameters,criteria="CritSum",n=3):
     criteria_sum=sum(criteria_list)
     
     rank_table=df_dict["rondrit127"].copy()[parameters]
+    for dataset in df_dict.keys():  
+        rank_table["MBF_{0}".format(dataset)]=df_dict[dataset]["MBF"]
 
     rank_table=pd.concat([rank_table,criteria_sum],axis=1).sort_values(criteria,ascending=False)[:3]
     return rank_table
@@ -45,7 +47,7 @@ def rank_tables(df_dict,parameters,criteria="CritSum",n=3):
 def normalise_metrics(dataframe,metric_list):
     for metric in metric_list:
         column=dataframe[metric]
-        if "Av" in metric:
+        if "MBF" in metric:
             inv=True
         else:
             inv=False
@@ -117,11 +119,13 @@ def table_pipeline_basic(tables_dict,drop=True):
             #Cleaning
             if(drop==True):
                 df=df.drop(columns=tables_dict[key].cols)
+            #Renaming
+            df=df.rename(columns={"Eff_1": "MEff", "Av_Best": "MBF"})
             #Normalize cols
             df=normalise_metrics(df,tables_dict[key].metric_list)
             #Create Dataset & Sum of Metrics Col
             df["Dataset"]=df.apply(lambda row: tables_dict[key].name, axis=1)
-            df["CritSum"]= df.apply(lambda row: (0.5*(row["Av_Best_unit"]+row["Eff_1_unit"])), axis=1)
+            df["CritSum"]= df.apply(lambda row: (0.5*(row["MBF_unit"]+row["MEff_unit"])), axis=1)
             #append finalt table to dict
             df_dict[tables_dict[key].name]=df
             #Appending process df to the object
@@ -141,7 +145,7 @@ def table_pipeline_tuning(tables_dict):
             df=normalise_metrics(df,tables_dict[key].metric_list)
             #Create Dataset & Sum of Metrics Col
             df["Dataset"]=df.apply(lambda row: tables_dict[key].name, axis=1)
-            df["CritSum"]= df.apply(lambda row: (0.5*(row["Av_Best_unit"]+row["Eff_1_unit"])), axis=1)
+            df["CritSum"]= df.apply(lambda row: (0.5*(row["MBF_unit"]+row["MEff_unit"])), axis=1)
             #append finalt table to dict
             df_dict[tables_dict[key].name]=df
             #Appending process df to the object
@@ -175,20 +179,14 @@ def load_matlab_ts(matfile,matfolder,Heur=False):
     ts_dict={}
     ts_dict["epoch"]=range(fit_values[1].shape[1])
 
-    # for i,NIND in enumerate(NIND_vector):
-    #     if(Heur==True):
-    #         #Heuristics case : each col is fit values for each impr (same NIND)
-    #         ts_dict["IMPR{0}".format(i)]=fit_values[i].flatten()
-    #     else:
-    #         ##Basic case /Stop criteria/Tuning case: each col is fit values for NIND 
-    #         ts_dict["{0}".format(NIND)]=fit_values[i].flatten()
+    Heuristics=["Path Cut","Inverse two","Inverse n","Small greedy","Big greedy","None"]
 
     if(Heur==True):
         for i in range(len(fit_values)):
-            ts_dict["IMPR{0}".format(i)]=fit_values[i].flatten()
+            ts_dict[Heuristics[i]]=fit_values[i].flatten()
 
     else:
-        for NIND in NIND_vector:
+        for i,NIND in enumerate(NIND_vector):
             ts_dict["{0}".format(NIND)]=fit_values[i].flatten()
 
     return pd.DataFrame(ts_dict)

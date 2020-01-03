@@ -23,7 +23,6 @@ function test_stop(x,y,NVAR,parameters,dataset_file,rank_table)
     %%Name of the file to save table from experiment i
     [ ~,filename, ~]=fileparts(dataset_file);
 
-
     %%Read table with parameter combinations
     %%Read the normalised table and extract the parameter to perform anova
     table_path=sprintf("Ap1/%s",rank_table); 
@@ -33,17 +32,33 @@ function test_stop(x,y,NVAR,parameters,dataset_file,rank_table)
     par_comb=readtable(table_path);
                   
     %%Performing Tests
-    for i=1:(height(par_comb))
+    % for i=1:(height(par_comb))
+        i=1;
         %%Loading parameter combination i from structure par_comb
         % NIND=par_comb.NIND(i);
         ELITIST=par_comb.ELITIST(i);
         PR_CROSS=par_comb.PR_CROSS(i);
         PR_MUT=par_comb.PR_MUT(i);
+
         %%Get F_Opt
-        F_Opt=0.9*par_comb.Av_Best;
+        switch filename
+        case 'rondrit016'
+            F_Opt=0.9*par_comb.MBF_rondrit016;
+
+        case 'rondrit048'
+            F_Opt=0.9*par_comb.MBF_rondrit048;
+
+        case 'rondrit070'
+            F_Opt=0.9*par_comb.MBF_rondrit070;
+
+        case 'rondrit127'
+            F_Opt=0.9*par_comb.MBF_rondrit127;
+
+            
+        end
 
         %%Table
-        stop_table_path=sprintf("Stop/Results_stop%d.csv",i);
+        stop_table_path=sprintf("Stop/Results_stop%s.csv",filename);
 
         StopCrit = "";Av_Best=0;Last_gen=0;
         Results = table(Last_gen,Av_Best,StopCrit);
@@ -58,9 +73,8 @@ function test_stop(x,y,NVAR,parameters,dataset_file,rank_table)
                 [Best_vector(n), ~,last_gen(n)] = run_ga_return(x, y, NIND,... 
                 MAXGEN, NVAR, ELITIST, F_Opt, PR_CROSS, PR_MUT, CROSSOVER, LOCALLOOP, STOP_EPOCHS,STOP_CRIT);
                 fprintf("Finished iter no. %d , %d iter remaining \n",n,N_EXPERIMENTS)
-                last_gen(n)
             end
-
+            
             %%Updating table
             Results.Last_gen(STOP_CRIT)=ceil(mean(last_gen));
             Results.Av_Best(STOP_CRIT)=mean(Best_vector);  
@@ -75,4 +89,4 @@ function test_stop(x,y,NVAR,parameters,dataset_file,rank_table)
         fprintf("Finished iter no. %d , %d iter remaining \n",i,height(par_comb))
 
     end
-    end
+    % end
