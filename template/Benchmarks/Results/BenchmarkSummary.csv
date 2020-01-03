@@ -1,0 +1,31 @@
+Heuristics,MBF,Peak Best,Dataset
+Path Cut,4387.78,3895.232,bcl380
+Inverse two,4227.382,3494.901,bcl380
+Inverse n,3169.562,2789.026,bcl380
+Small greedy,2423.143,2161.142,bcl380
+Big greedy,1844.475,1791.816,bcl380
+,4383.929,3847.624,bcl380
+Path Cut,687.093,659.816,belgiumtour
+Inverse two,699.778,677.713,belgiumtour
+Inverse n,678.502,669.446,belgiumtour
+Small greedy,701.794,679.241,belgiumtour
+Big greedy,684.47,659.816,belgiumtour
+,705.841,659.816,belgiumtour
+Path Cut,10826.76,9710.993,rbx711
+Inverse two,9988.208,9395.093,rbx711
+Inverse n,7109.542,5670.786,rbx711
+Small greedy,4641.398,4287.251,rbx711
+Big greedy,3599.984,3553.425,rbx711
+,10223.405,8793.975,rbx711
+Path Cut,782.99,700.234,xqf131
+Inverse two,848.286,790.639,xqf131
+Inverse n,638.163,609.543,xqf131
+Small greedy,694.772,662.161,xqf131
+Big greedy,636.842,617.574,xqf131
+,909.757,800.174,xqf131
+Path Cut,8726.947,7201.993,xql662
+Inverse two,8022.303,7462.349,xql662
+Inverse n,5752.307,5286.404,xql662
+Small greedy,3887.445,3709.455,xql662
+Big greedy,2922.898,2809.683,xql662
+,7949.38,6918.216,xql662

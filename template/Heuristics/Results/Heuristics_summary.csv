@@ -1,0 +1,25 @@
+Heuristics,MBF,Peak Best,NImprovements,Dataset
+Path Cut,3.362,3.35,34096,rondrit016
+Inverse two,3.378,3.35,33606,rondrit016
+Inverse n,3.357,3.35,45543,rondrit016
+Small greedy,3.388,3.35,26925,rondrit016
+Big greedy,3.369,3.35,50161,rondrit016
+,3.4,3.35,0,rondrit016
+Path Cut,4.466,4.33,58013,rondrit048
+Inverse two,4.596,4.399,54954,rondrit048
+Inverse n,4.443,4.327,48207,rondrit048
+Small greedy,4.618,4.33,37535,rondrit048
+Big greedy,4.528,4.362,39641,rondrit048
+,4.849,4.502,0,rondrit048
+Path Cut,7.572,7.22,80367,rondrit070
+Inverse two,8.339,7.286,68672,rondrit070
+Inverse n,7.116,6.883,65323,rondrit070
+Small greedy,7.823,7.274,41677,rondrit070
+Big greedy,7.195,6.857,39763,rondrit070
+,8.832,8.116,0,rondrit070
+Path Cut,7.435,6.845,127529,rondrit127
+Inverse two,8.134,7.253,102070,rondrit127
+Inverse n,6.689,6.254,138085,rondrit127
+Small greedy,7.079,6.435,61287,rondrit127
+Big greedy,6.362,6.027,57945,rondrit127
+,8.756,8.073,0,rondrit127
